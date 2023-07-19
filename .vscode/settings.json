@@ -3,6 +3,17 @@
         "array": "cpp",
         "string_view": "cpp",
         "initializer_list": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "vector": "cpp",
+        "*.ds_store": "cpp",
+        "ffconf.h": "c",
+        "user_diskio.h": "c",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "streambuf": "cpp",
+        "string": "cpp",
+        "ostream": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp"
     }
 }

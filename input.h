@@ -1,29 +1,23 @@
- #pragma once
- #include <stdint.h>
+/**
+ * @file input.h
+ * Input: main API
+ */
 
+#pragma once
 
-#define RECORD_INPUT_EVENTS "ievnt"
+#include "furi_hal_resources.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define INPUT_DEBOUNCE_TICKS_HALF (INPUT_DEBOUNCE_TICKS / 2)
-#define INPUT_PRESS_TICKS 150
-#define INPUT_LONG_PRESS_COUNTS 2
-#define INPUT_THREAD_FLAG_ISR 0x00000001
-
- 
+#define RECORD_INPUT_EVENTS "input_events"
 #define INPUT_SEQUENCE_SOURCE_HARDWARE (0u)
 #define INPUT_SEQUENCE_SOURCE_SOFTWARE (1u)
 
-typedef enum {
-    InputKeyUp,
-    InputKeyDown,
-    InputKeyRight,
-    InputKeyLeft,
-    InputKeyOk,
-    InputKeyBack,
-    InputKeyMAX, /**< Special value */
-} InputKey;
-
+/** Input Types
+ * Some of them are physical events and some logical
+ */
 typedef enum {
     InputTypePress, /**< Press event, emitted after debounce */
     InputTypeRelease, /**< Release event, emitted after debounce */
@@ -33,6 +27,7 @@ typedef enum {
     InputTypeMAX, /**< Special value for exceptional */
 } InputType;
 
+/** Input Event, dispatches with FuriPubSub */
 typedef struct {
     union {
         uint32_t sequence;
@@ -44,3 +39,19 @@ typedef struct {
     InputKey key;
     InputType type;
 } InputEvent;
+
+/** Get human readable input key name
+ * @param key - InputKey
+ * @return string
+ */
+const char* input_get_key_name(InputKey key);
+
+/** Get human readable input type name
+ * @param type - InputType
+ * @return string
+ */
+const char* input_get_type_name(InputType type);
+
+#ifdef __cplusplus
+}
+#endif
