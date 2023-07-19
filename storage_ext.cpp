@@ -45,8 +45,16 @@ static FS_Error storage_ext_parse_error(SDError error) {
 
 
 void storage_ext_init(StorageData* storage) {
-  // storage->status = StorageStatusNotReady;
-  storage->status = StorageStatusOK;
+    // if (!SD.begin(SD_CS)) {
+    // pinMode(5, OUTPUT);
+    // if (!SD.begin(5)){
+    //     Serial.println(F("Failed to mount SD Card"));
+    // } else {
+    //     Serial.println(F("Mounted SD Card"));
+    //     storage->status = StorageStatusOK;
+    // }
+    // storage->status = StorageStatusNotReady;
+  
 }
 
 FS_Error sd_unmount_card(StorageData* storage) {

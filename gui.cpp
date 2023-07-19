@@ -110,12 +110,12 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
     /* for support black theme - paint white area and
      * draw icon with transparent white color
      */
-    canvas_set_color(gui->canvas, WHITE);
+    canvas_set_color(gui->canvas, ColorWhite);
     canvas_draw_box(gui->canvas, 1, 1, 9, 7);
     canvas_draw_box(gui->canvas, 7, 3, 58, 6);
     canvas_draw_box(gui->canvas, 61, 1, 32, 7);
     canvas_draw_box(gui->canvas, 89, 3, 38, 6);
-    canvas_set_color(gui->canvas, WHITE);
+    canvas_set_color(gui->canvas, ColorBlack);
     canvas_set_bitmap_mode(gui->canvas, 1);
     canvas_draw_icon(gui->canvas, 0, 0, &I_Background_128x11);
     canvas_set_bitmap_mode(gui->canvas, 0);
@@ -141,7 +141,7 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
             canvas_set_color(gui->canvas, ColorWhite);
             canvas_draw_box(
                 gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas));
-            canvas_set_color(gui->canvas, WHITE);
+            canvas_set_color(gui->canvas, ColorBlack);
             // ViewPort draw
             canvas_frame_set(
                 gui->canvas, x, GUI_STATUS_BAR_Y + 2, width, GUI_STATUS_BAR_WORKAREA_HEIGHT);
@@ -157,7 +157,7 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
             GUI_STATUS_BAR_Y,
             right_used + 3,
             GUI_STATUS_BAR_HEIGHT);
-        canvas_set_color(gui->canvas, WHITE);
+        canvas_set_color(gui->canvas, ColorBlack);
         canvas_draw_rframe(
             gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas), 1);
         canvas_draw_line(
@@ -192,7 +192,7 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
             canvas_set_color(gui->canvas, ColorWhite);
             canvas_draw_box(
                 gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas));
-            canvas_set_color(gui->canvas, WHITE);
+            canvas_set_color(gui->canvas, ColorBlack);
             // ViewPort draw
             canvas_frame_set(
                 gui->canvas, x, GUI_STATUS_BAR_Y + 2, width, GUI_STATUS_BAR_WORKAREA_HEIGHT);
@@ -215,7 +215,7 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
             GUI_STATUS_BAR_WORKAREA_HEIGHT + 2);
         canvas_set_color(gui->canvas, ColorWhite);
         canvas_draw_box(gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas));
-        canvas_set_color(gui->canvas, WHITE);
+        canvas_set_color(gui->canvas, ColorBlack);
         // Draw Icon
         canvas_frame_set(
             gui->canvas, x, GUI_STATUS_BAR_Y + 2, width, GUI_STATUS_BAR_WORKAREA_HEIGHT);

@@ -1,6 +1,6 @@
 #include <FS.h>
 #include <SPI.h>
-#include <SD.h>
+#include "SD.h"
 
 #include "record.h"
 #include "storage.h"
@@ -24,6 +24,7 @@
 #define FILE_BUFFER_SIZE 512
 
 #define TAG "StorageAPI"
+
 
 typedef enum {
     StorageEventFlagFileClose = (1 << 0),
@@ -550,10 +551,13 @@ FS_Error storage_common_merge(Storage* storage, const char* old_path, const char
 
 static bool storage_dir_open_internal(FZFile* file, const char* path) {
     fs::File root = SD.open(path);
+    // Serial.println("root");
+    // Serial.println(root.isDirectory());
     if(!root.isDirectory()){
         file->type = FileTypeOpenFile;
         return false;
     }
+    file->fsFile = root;
     file->type = FileTypeOpenDir;
     return true;
 }
@@ -771,7 +775,8 @@ bool storage_dir_open(FZFile* file, const char* path) {
 
     do {
         result = storage_dir_open_internal(file, path);
-
+        // Serial.println("storage_dir_open_internal");
+        // Serial.println(result);
         if(!result && file->error_id == FSE_ALREADY_OPEN) {
             // furi_event_flag_wait(event, StorageEventFlagFileClose, FuriFlagWaitAny, FuriWaitForever);
         } else {
@@ -798,8 +803,11 @@ bool storage_dir_read(FZFile* file, FileInfo* fileinfo, char* name, uint16_t nam
     if (file->type != FileTypeOpenDir) {
         return false;
     }
-
+    // Serial.print("dir name: ");
+    // Serial.println(file->fsFile.name());
     fs::File entry = file->fsFile.openNextFile();
+    // Serial.print("name: ");
+    // Serial.println(entry.name());
     if (!entry) {
         file->error_id = FSE_NOT_EXIST;
         return false;
