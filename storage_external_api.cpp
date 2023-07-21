@@ -689,11 +689,11 @@ bool storage_file_is_dir(FZFile* file) {
 }
 
 uint16_t storage_file_read(FZFile* file, void* buff, uint16_t bytes_to_read) {
-    return file->fsFile.read(static_cast<uint8_t*>(buff), bytes_to_read);
+    return file->fsFile.read(buff, bytes_to_read);
 }
 
 uint16_t storage_file_write(FZFile* file, const void* buff, uint16_t bytes_to_write) {
-    return file->fsFile.write(static_cast<const uint8_t*>(buff), bytes_to_write);
+    return file->fsFile.write(buff, bytes_to_write);
 }
 
 bool storage_file_seek(FZFile* file, uint32_t offset, bool from_start) {
@@ -740,7 +740,7 @@ if (file) {
 }
 
 bool storage_file_eof(FZFile* file) {
-    return file->fsFile.available() == 0;
+    return file->fsFile.available() == false;
 }
 
 bool storage_file_exists(Storage* storage, const char* path) {
