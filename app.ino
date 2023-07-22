@@ -170,6 +170,13 @@ void setup() {
   flipper_format_file_close(file);
   */
 
+  // // StorageAnimation* animation_storage_find_animation(HARDCODED_ANIMATION_NAME)
+  // StorageAnimation* new_animation = animation_manager_select_idle_animation(animation_manager);
+  // animation_manager_replace_current_animation(animation_manager, new_animation);
+  // const BubbleAnimation* bubble_animation =
+  //     animation_storage_get_bubble_animation(animation_manager->current_animation);
+  // animation_manager->state = AnimationManagerStateIdle;
+  // furi_timer_start(animation_manager->idle_animation_timer, bubble_animation->duration * 1000);
 
   // flipper_format_set_strict_mode(file, true);
 

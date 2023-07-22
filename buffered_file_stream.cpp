@@ -43,7 +43,7 @@ const StreamVTable buffered_file_stream_vtable = {
 };
 
 FZStream* buffered_file_stream_alloc(Storage* storage) {
-    BufferedFileStream* stream = malloc(sizeof(BufferedFileStream));
+    BufferedFileStream* stream = (BufferedFileStream*)malloc(sizeof(BufferedFileStream));
 
     stream->file_stream = file_stream_alloc(storage);
     stream->cache = stream_cache_alloc();

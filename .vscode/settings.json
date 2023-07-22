@@ -15,6 +15,7 @@
         "ostream": "cpp",
         "forward_list": "cpp",
         "list": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "type_traits": "cpp"
     }
 }

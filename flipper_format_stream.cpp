@@ -279,34 +279,34 @@ bool flipper_format_stream_write_value_line(FZStream* stream, FlipperStreamWrite
             for(uint16_t i = 0; i < write_data->data_size; i++) {
                 switch(write_data->type) {
                 case FlipperStreamValueStr: {
-                    const char* data = write_data->data;
+                    const char* data = (const char*)write_data->data;
                     furi_string_printf(value, "%s", data);
                 }; break;
                 case FlipperStreamValueHex: {
-                    const uint8_t* data = write_data->data;
+                    const uint8_t* data = (const uint8_t*)write_data->data;
                     furi_string_printf(value, "%02X", data[i]);
                 }; break;
 #ifndef FLIPPER_STREAM_LITE
                 case FlipperStreamValueFloat: {
-                    const float* data = write_data->data;
+                    const float* data = (const float*)write_data->data;
                     furi_string_printf(value, "%f", (double)data[i]);
                 }; break;
 #endif
                 case FlipperStreamValueInt32: {
-                    const int32_t* data = write_data->data;
+                    const int32_t* data = (const int32_t*)write_data->data;
                     furi_string_printf(value, "%" PRIi32, data[i]);
                 }; break;
                 case FlipperStreamValueUint32: {
-                    const uint32_t* data = write_data->data;
+                    const uint32_t* data = (const uint32_t*)write_data->data;
                     furi_string_printf(value, "%" PRIu32, data[i]);
                 }; break;
                 case FlipperStreamValueHexUint64: {
-                    const uint64_t* data = write_data->data;
+                    const uint64_t* data = (const uint64_t*)write_data->data;
                     furi_string_printf(
                         value, "%08lX%08lX", (uint32_t)(data[i] >> 32), (uint32_t)data[i]);
                 }; break;
                 case FlipperStreamValueBool: {
-                    const bool* data = write_data->data;
+                    const bool* data = (const bool*)write_data->data;
                     furi_string_printf(value, data[i] ? "true" : "false");
                 }; break;
                 default:
@@ -392,15 +392,15 @@ bool flipper_format_stream_read_value_line(
                     }; break;
 #endif
                     case FlipperStreamValueInt32: {
-                        int32_t* data = _data;
+                        int32_t* data = (int32_t*)_data;
                         scan_values = sscanf(furi_string_get_cstr(value), "%" PRIi32, &data[i]);
                     }; break;
                     case FlipperStreamValueUint32: {
-                        uint32_t* data = _data;
+                        uint32_t* data = (uint32_t*)_data;
                         scan_values = sscanf(furi_string_get_cstr(value), "%" PRIu32, &data[i]);
                     }; break;
                     case FlipperStreamValueHexUint64: {
-                        uint64_t* data = _data;
+                        uint64_t* data = (uint64_t*)_data;
                         if(furi_string_size(value) >= 16) {
                             if(hex_chars_to_uint64(furi_string_get_cstr(value), &data[i])) {
                                 scan_values = 1;

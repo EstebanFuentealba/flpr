@@ -24,21 +24,21 @@ FZStream* flipper_format_get_raw_stream(FlipperFormat* flipper_format) {
 /********************************** Public **********************************/
 
 FlipperFormat* flipper_format_string_alloc() {
-    FlipperFormat* flipper_format = malloc(sizeof(FlipperFormat));
+    FlipperFormat* flipper_format =(FlipperFormat*) malloc(sizeof(FlipperFormat));
     flipper_format->stream = string_stream_alloc();
     flipper_format->strict_mode = false;
     return flipper_format;
 }
 
 FlipperFormat* flipper_format_file_alloc(Storage* storage) {
-    FlipperFormat* flipper_format = malloc(sizeof(FlipperFormat));
+    FlipperFormat* flipper_format = (FlipperFormat*)malloc(sizeof(FlipperFormat));
     flipper_format->stream = file_stream_alloc(storage);
     flipper_format->strict_mode = false;
     return flipper_format;
 }
 
 FlipperFormat* flipper_format_buffered_file_alloc(Storage* storage) {
-    FlipperFormat* flipper_format = malloc(sizeof(FlipperFormat));
+    FlipperFormat* flipper_format = (FlipperFormat*)malloc(sizeof(FlipperFormat));
     flipper_format->stream = buffered_file_stream_alloc(storage);
     flipper_format->strict_mode = false;
     return flipper_format;

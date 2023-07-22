@@ -35,7 +35,7 @@ const StreamVTable file_stream_vtable = {
 };
 
 FZStream* file_stream_alloc(Storage* storage) {
-    FileStream* stream = malloc(sizeof(FileStream));
+    FileStream* stream = (FileStream*) malloc(sizeof(FileStream));
     stream->file = storage_file_alloc(storage);
     stream->storage = storage;
 
