@@ -93,6 +93,16 @@ bool flipper_application_load_name_and_icon(
     uint8_t** icon_ptr,
     FuriString* item_name);
 
+/**
+ * @brief Allocate application thread at entry point address, using app name and
+ * stack size from metadata. Returned thread isn't started yet. 
+ * Can be only called once for application instance.
+ * @param app Applicaiton pointer
+ * @param args Args to pass to app's entry point
+ * @return Created thread
+ */
+FuriThread* flipper_application_alloc_thread(FlipperApplication* app, const char* args);
+
 #ifdef __cplusplus
 }
 #endif

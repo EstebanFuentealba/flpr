@@ -9,7 +9,7 @@ const char* FLIPPER_AUTORUN_APP_NAME = "";
 // extern int32_t desktop_srv(void* p);
 extern int32_t gui_srv(void* p);
 extern int32_t input_srv(void* p);
-// extern int32_t loader_srv(void* p);
+extern int32_t loader_srv(void* p);
 // extern int32_t notification_srv(void* p);
 // extern int32_t power_srv(void* p);
 // extern int32_t storage_srv(void* p);
@@ -50,14 +50,13 @@ const FlipperInternalApplication FLIPPER_SERVICES[] = {
 //     //  .icon = NULL,
 //     //  .flags = FlipperApplicationFlagDefault },
 
-    {
-     .app = gui_srv,
-     .name = "GuiSrv",
-     .appid = "gui", 
-     .stack_size = 1024,
-     .icon = NULL,
-     .flags = FlipperInternalApplicationFlagDefault },
-
+    // {
+    //  .app = gui_srv,
+    //  .name = "GuiSrv",
+    //  .appid = "gui", 
+    //  .stack_size = 1024,
+    //  .icon = NULL,
+    //  .flags = FlipperInternalApplicationFlagDefault },
     {.app = input_srv,
      .name = "InputSrv",
      .appid = "input", 
@@ -65,12 +64,13 @@ const FlipperInternalApplication FLIPPER_SERVICES[] = {
      .icon = NULL,
      .flags = FlipperInternalApplicationFlagDefault },
 
-//     // {.app = loader_srv,
-//     //  .name = "LoaderSrv",
-//     //  .appid = "loader", 
-//     //  .stack_size = 2048,
-//     //  .icon = NULL,
-//     //  .flags = FlipperApplicationFlagDefault },
+
+    // {.app = loader_srv,
+    //  .name = "LoaderSrv",
+    //  .appid = "loader", 
+    //  .stack_size = 2048,
+    //  .icon = NULL,
+    //  .flags = FlipperInternalApplicationFlagDefault },
 
 //     // {.app = notification_srv,
 //     //  .name = "NotificationSrv",
@@ -273,7 +273,7 @@ const size_t FLIPPER_SERVICES_COUNT = COUNT_OF(FLIPPER_SERVICES);
 // extern void storage_on_system_start();
 // extern void updater_on_system_start();
 // extern void storage_move_to_sd_start();
-// const FlipperOnStartHook FLIPPER_ON_SYSTEM_START[] = {
+const FlipperInternalOnStartHook FLIPPER_ON_SYSTEM_START[] = {
 // crypto_on_system_start,
 // rpc_on_system_start,
 // infrared_on_system_start,
@@ -288,8 +288,8 @@ const size_t FLIPPER_SERVICES_COUNT = COUNT_OF(FLIPPER_SERVICES);
 // storage_on_system_start,
 // updater_on_system_start,
 // storage_move_to_sd_start
-// };
-// const size_t FLIPPER_ON_SYSTEM_START_COUNT = COUNT_OF(FLIPPER_ON_SYSTEM_START);
+};
+const size_t FLIPPER_ON_SYSTEM_START_COUNT = COUNT_OF(FLIPPER_ON_SYSTEM_START);
 // extern int32_t archive_app(void* p);
 // const FlipperApplication FLIPPER_ARCHIVE = 
 //     {.app = archive_app,

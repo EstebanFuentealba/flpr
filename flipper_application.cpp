@@ -13,7 +13,7 @@ struct FlipperApplication {
     // ELFDebugInfo state;
     FlipperApplicationManifest manifest;
     // ELFFile* elf;
-    // FuriThread* thread;
+    FuriThread* thread;
     void* ep_thread_args;
 };
 
@@ -68,10 +68,10 @@ bool flipper_application_is_plugin(FlipperApplication* app) {
 void flipper_application_free(FlipperApplication* app) {
     // furi_assert(app);
 
-    // if(app->thread) {
-    //     furi_thread_join(app->thread);
-    //     furi_thread_free(app->thread);
-    // }
+    if(app->thread) {
+        furi_thread_join(app->thread);
+        furi_thread_free(app->thread);
+    }
 
     // if(app->state.entry) {
     //     flipper_application_list_remove_app(app);
@@ -247,48 +247,48 @@ const FlipperApplicationManifest* flipper_application_get_manifest(FlipperApplic
 //     }
 // }
 
-// static int32_t flipper_application_thread(void* context) {
-//     // furi_assert(context);
-//     FlipperApplication* app = (FlipperApplication*)context;
+static int32_t flipper_application_thread(void* context) {
+    // furi_assert(context);
+    FlipperApplication* app = (FlipperApplication*)context;
 
-//     elf_file_call_init(app->elf);
+    // elf_file_call_init(app->elf);
 
-//     FlipperApplicationEntryPoint entry_point = elf_file_get_entry_point(app->elf);
-//     int32_t ret_code = entry_point(app->ep_thread_args);
+    // FlipperApplicationEntryPoint entry_point = elf_file_get_entry_point(app->elf);
+    // int32_t ret_code = entry_point(app->ep_thread_args);
 
-//     elf_file_call_fini(app->elf);
+    // elf_file_call_fini(app->elf);
 
-//     // wait until all notifications from RAM are completed
-//     NotificationApp* notifications = furi_record_open(RECORD_NOTIFICATION);
-//     const NotificationSequence sequence_empty = {
-//         NULL,
-//     };
-//     notification_message_block(notifications, &sequence_empty);
-//     furi_record_close(RECORD_NOTIFICATION);
+    // wait until all notifications from RAM are completed
+    // NotificationApp* notifications = furi_record_open(RECORD_NOTIFICATION);
+    // const NotificationSequence sequence_empty = {
+    //     NULL,
+    // };
+    // notification_message_block(notifications, &sequence_empty);
+    // furi_record_close(RECORD_NOTIFICATION);
 
-//     return ret_code;
-// }
+    return 0;
+}
 
-// FuriThread* flipper_application_alloc_thread(FlipperApplication* app, const char* args) {
-//     // furi_check(app->thread == NULL);
-//     // furi_check(!flipper_application_is_plugin(app));
+FuriThread* flipper_application_alloc_thread(FlipperApplication* app, const char* args) {
+    // furi_check(app->thread == NULL);
+    // furi_check(!flipper_application_is_plugin(app));
 
-//     if(app->ep_thread_args) {
-//         free(app->ep_thread_args);
-//     }
+    if(app->ep_thread_args) {
+        free(app->ep_thread_args);
+    }
 
-//     if(args) {
-//         app->ep_thread_args = strdup(args);
-//     } else {
-//         app->ep_thread_args = NULL;
-//     }
+    if(args) {
+        app->ep_thread_args = strdup(args);
+    } else {
+        app->ep_thread_args = NULL;
+    }
 
-//     const FlipperApplicationManifest* manifest = flipper_application_get_manifest(app);
-//     app->thread = furi_thread_alloc_ex(
-//         manifest->name, manifest->stack_size, flipper_application_thread, app);
+    const FlipperApplicationManifest* manifest = flipper_application_get_manifest(app);
+    app->thread = furi_thread_alloc_ex(
+        manifest->name, manifest->stack_size, flipper_application_thread, app);
 
-//     return app->thread;
-// }
+    return app->thread;
+}
 
 // static const char* preload_status_strings[] = {
 //     [FlipperApplicationPreloadStatusSuccess] = "Success",

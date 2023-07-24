@@ -1,6 +1,6 @@
 #include "view_i.h"
 #include <freertos/FreeRTOS.h>
-// #include <freertos/semphr.h>
+#include <freertos/semphr.h>
 
 View* view_alloc() {
     View* view = (View*)malloc(sizeof(View));
@@ -84,55 +84,55 @@ void view_allocate_model(View* view, ViewModelType type, size_t size) {
     view->model_type = type;
     Serial.print("[view] model_type: ");
     Serial.println(type);
-    // if (view->model_type == ViewModelTypeLockFree) {
+    if (view->model_type == ViewModelTypeLockFree) {
     view->model = malloc(size);
-    // } else if (view->model_type == ViewModelTypeLocking) {
-    //     ViewModelLocking* model = (ViewModelLocking*)malloc(sizeof(ViewModelLocking));
-    //     model->mutex = furi_mutex_alloc(FuriMutexTypeRecursive);
-    //     //furi_check(model->mutex);
-    //     model->data = malloc(size);
-    //     view->model = model;
-    // } else {
-    //     //furi_crash(NULL);
-    // }
+    } else if (view->model_type == ViewModelTypeLocking) {
+        ViewModelLocking* model = (ViewModelLocking*)malloc(sizeof(ViewModelLocking));
+        model->mutex = furi_mutex_alloc(FuriMutexTypeRecursive);
+        //furi_check(model->mutex);
+        model->data = malloc(size);
+        view->model = model;
+    } else {
+        //furi_crash(NULL);
+    }
 }
 
 void view_free_model(View* view) {
-  view->model = NULL;
+//   view->model = NULL;
     // free(view->model);
     //furi_assert(view);
-    // if (view->model_type == ViewModelTypeNone) {
-    //     return;
-    // } else if (view->model_type == ViewModelTypeLockFree) {
-    //     free(view->model);
-    // } else if (view->model_type == ViewModelTypeLocking) {
-    //     ViewModelLocking* model = (ViewModelLocking*)view->model;
-    //     vSemaphoreDelete(model->mutex);
-    //     free(model->data);
-    //     free(model);
-    //     view->model = NULL;
-    // } else {
-    //     //furi_crash(NULL);
-    // }
+    if (view->model_type == ViewModelTypeNone) {
+        return;
+    } else if (view->model_type == ViewModelTypeLockFree) {
+        free(view->model);
+    } else if (view->model_type == ViewModelTypeLocking) {
+        ViewModelLocking* model = (ViewModelLocking*)view->model;
+        vSemaphoreDelete(model->mutex);
+        free(model->data);
+        free(model);
+        view->model = NULL;
+    } else {
+        //furi_crash(NULL);
+    }
 }
 
 void* view_get_model(View* view) {
     //furi_assert(view);
-    // if(view->model_type == ViewModelTypeLocking) {
-    //     ViewModelLocking* model = (ViewModelLocking*)(view->model);
-    //     Serial.println("[view] check xSemaphoreGetMutexHolder mutex");
-    //     // if (xSemaphoreGetMutexHolder((SemaphoreHandle_t)model->mutex)) {
-    //         Serial.println("[view] is valid xSemaphoreGetMutexHolder mutex");
-    //         if(furi_mutex_acquire(model->mutex, 10) == FuriStatusOk) {
-    //             Serial.println("[view] furi_mutex_acquired");
-    //             return model->data;
-    //         }
-    //     // } else {
-    //     //     Serial.println("El semáforo no es una instancia de xSemaphoreCreateMutex");
+    if(view->model_type == ViewModelTypeLocking) {
+        ViewModelLocking* model = (ViewModelLocking*)(view->model);
+        Serial.println("[view] check xSemaphoreGetMutexHolder mutex");
+        if (xSemaphoreGetMutexHolder((SemaphoreHandle_t)model->mutex)) {
+            Serial.println("[view] is valid xSemaphoreGetMutexHolder mutex");
+            if(furi_mutex_acquire(model->mutex, 10) == FuriStatusOk) {
+                Serial.println("[view] furi_mutex_acquired");
+                return model->data;
+            }
+        } else {
+            Serial.println("El semáforo no es una instancia de xSemaphoreCreateMutex");
 
-    //     // }
-    //     // furi_check(furi_mutex_acquire(model->mutex, FuriWaitForever) == FuriStatusOk);
-    // }
+        }
+        // furi_check(furi_mutex_acquire(model->mutex, FuriWaitForever) == FuriStatusOk);
+    }
     return view->model;
 }
 
@@ -156,11 +156,11 @@ void view_icon_animation_callback(Icon* instance, void* context) {
 
 void view_unlock_model(View* view) {
     //furi_assert(view);
-    // if(view->model_type == ViewModelTypeLocking) {
-    //     ViewModelLocking* model = (ViewModelLocking*)(view->model);
-    //     // furi_mutex_release(model->mutex);
-    //     // furi_check(furi_mutex_release(model->mutex) == FuriStatusOk);
-    // }
+    if(view->model_type == ViewModelTypeLocking) {
+        ViewModelLocking* model = (ViewModelLocking*)(view->model);
+        furi_mutex_release(model->mutex);
+        // furi_check(furi_mutex_release(model->mutex) == FuriStatusOk);
+    }
 }
 
 void view_draw(View* view, Canvas* canvas) {
@@ -168,7 +168,7 @@ void view_draw(View* view, Canvas* canvas) {
     if(view->draw_callback) {
         void* data = view_get_model(view);
         view->draw_callback(canvas, data);
-        // view_unlock_model(view);
+        view_unlock_model(view);
     }
 }
 

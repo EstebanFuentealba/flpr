@@ -9,7 +9,7 @@
 #include "kernel.h"
 // #include "memmgr.h"
 // #include "memmgr_heap.h"
-// #include "message_queue.h"
+#include "message_queue.h"
 #include "mutex.h"
 #include "pubsub.h"
 #include "record.h"

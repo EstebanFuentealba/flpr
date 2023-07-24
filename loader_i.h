@@ -1,6 +1,6 @@
 #pragma once
 #include "furi.h"
-// #include "api_lock.h"
+#include "api_lock.h"
 #include "flipper_application.h"
 #include "loader.h"
 #include "loader_menu.h"
@@ -8,14 +8,14 @@
 
 typedef struct {
     char* args;
-    // FuriThread* thread;
+    FuriThread* thread;
     bool insomniac;
     FlipperApplication* fap;
 } LoaderAppData;
 
 struct Loader {
     FuriPubSub* pubsub;
-    // FuriMessageQueue* queue;
+    FuriMessageQueue* queue;
     LoaderMenu* loader_menu;
     LoaderApplications* loader_applications;
     LoaderAppData app;
@@ -47,7 +47,7 @@ typedef struct {
 } LoaderMessageBoolResult;
 
 typedef struct {
-    // FuriApiLock api_lock;
+    FuriApiLock api_lock;
     LoaderMessageType type;
 
     union {

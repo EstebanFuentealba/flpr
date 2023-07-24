@@ -69,7 +69,7 @@ struct Gui {
     CanvasCallbackPairArray_t canvas_callback_pair;
 
     // Input
-    // FuriMessageQueue* input_queue;
+    FuriMessageQueue* input_queue;
     FuriPubSub* input_events;
     uint8_t ongoing_input;
     ViewPort* ongoing_input_view_port;

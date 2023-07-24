@@ -21,7 +21,7 @@ typedef struct {
 } StorageSDGui;
 
 struct Storage {
-    // FuriMessageQueue* message_queue;
+    FuriMessageQueue* message_queue;
     StorageData storage;
     StorageSDGui sd_gui;
     FuriPubSub* pubsub;

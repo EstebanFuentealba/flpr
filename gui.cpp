@@ -74,9 +74,11 @@ void gui_input_events_callback(const void* value, void* ctx) {
     // furi_assert(ctx);
 
     Gui* gui = (Gui*)ctx;
-
-    // furi_message_queue_put(gui->input_queue, value, FuriWaitForever);
-    // furi_thread_flags_set(gui->thread_id, GUI_THREAD_FLAG_INPUT);
+   
+    furi_message_queue_put(gui->input_queue, value, FuriWaitForever);
+     Serial.println("[gui] furi_message_queue_put");
+    furi_thread_flags_set(gui->thread_id, GUI_THREAD_FLAG_INPUT);
+     Serial.println("[gui] furi_thread_flags_set");
 }
 
 // Only Fullscreen supports vertical display for now
@@ -589,13 +591,16 @@ Gui* gui_alloc() {
     // Drawing canvas
     gui->canvas = canvas_init();
     CanvasCallbackPairArray_init(gui->canvas_callback_pair);
-
+    Serial.println("[gui] CanvasCallbackPairArray_init");
     // Input
-    // gui->input_queue = furi_message_queue_alloc(8, sizeof(InputEvent));
+    gui->input_queue = furi_message_queue_alloc(8, sizeof(InputEvent));
+    Serial.println("[gui] input_queue");
     gui->input_events = (FuriPubSub*)furi_record_open(RECORD_INPUT_EVENTS);
+    Serial.println("[gui] input_events");
 
     // furi_check(gui->input_events);
     furi_pubsub_subscribe(gui->input_events, gui_input_events_callback, gui);
+    Serial.println("[gui] furi_pubsub_subscribe");
 
     return gui;
 }
@@ -621,13 +626,13 @@ int32_t gui_srv(void* p) {
     //     Serial.println("flags:");
     //      Serial.println(flags);
     //     // Process and dispatch input
-        if(flags & GUI_THREAD_FLAG_INPUT) {
-            // Process till queue become empty
-            InputEvent input_event;
-            // while(furi_message_queue_get(gui->input_queue, &input_event, 0) == FuriStatusOk) {
-            //     gui_input(gui, &input_event);
-            // }
-        }
+        // if(flags & GUI_THREAD_FLAG_INPUT) {
+        //     // Process till queue become empty
+        //     InputEvent input_event;
+        //     while(furi_message_queue_get(gui->input_queue, &input_event, 0) == FuriStatusOk) {
+        //         gui_input(gui, &input_event);
+        //     }
+        // }
         // Process and dispatch draw call
         if(flags & GUI_THREAD_FLAG_DRAW) {
             // Clear flags that arrived on input step

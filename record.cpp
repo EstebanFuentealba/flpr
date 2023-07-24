@@ -1,8 +1,8 @@
 #include "record.h"
 // #include "check.h"
 // #include "memmgr.h"
-// #include "mutex.h"
-// #include "event_flag.h"
+#include "mutex.h"
+#include "event_flag.h"
 
 #include <m-dict.h>
 #include "m_cstr_dup.h"
@@ -10,7 +10,7 @@
 #define FURI_RECORD_FLAG_READY (0x1)
 
 typedef struct {
-    // FuriEventFlag* flags;
+    FuriEventFlag* flags;
     void* data;
     size_t holders_count;
 } FuriRecordData;
@@ -18,7 +18,7 @@ typedef struct {
 DICT_DEF2(FuriRecordDataDict, const char*, M_CSTR_DUP_OPLIST, FuriRecordData, M_POD_OPLIST)
 
 typedef struct {
-    // FuriMutex* mutex;
+    FuriMutex* mutex;
     FuriRecordDataDict_t records;
 } FuriRecord;
 
@@ -33,13 +33,13 @@ static void furi_record_put(const char* name, FuriRecordData* record_data) {
 }
 
 static void furi_record_erase(const char* name, FuriRecordData* record_data) {
-    // furi_event_flag_free(record_data->flags);
+    furi_event_flag_free(record_data->flags);
     FuriRecordDataDict_erase(furi_record->records, name);
 }
 
 void furi_record_init() {
-    furi_record = malloc(sizeof(FuriRecord));
-    // furi_record->mutex = furi_mutex_alloc(FuriMutexTypeNormal);
+    furi_record = (FuriRecord*)malloc(sizeof(FuriRecord));
+    furi_record->mutex = furi_mutex_alloc(FuriMutexTypeNormal);
     // furi_check(furi_record->mutex);
     FuriRecordDataDict_init(furi_record->records);
 }
@@ -49,7 +49,7 @@ static FuriRecordData* furi_record_data_get_or_create(const char* name) {
     FuriRecordData* record_data = furi_record_get(name);
     if(!record_data) {
         FuriRecordData new_record;
-        // new_record.flags = furi_event_flag_alloc();
+        new_record.flags = furi_event_flag_alloc();
         new_record.data = NULL;
         new_record.holders_count = 0;
         furi_record_put(name, &new_record);
@@ -59,10 +59,12 @@ static FuriRecordData* furi_record_data_get_or_create(const char* name) {
 }
 
 static void furi_record_lock() {
+    if(furi_mutex_acquire(furi_record->mutex, FuriWaitForever) == FuriStatusOk) {}
     // furi_check(furi_mutex_acquire(furi_record->mutex, FuriWaitForever) == FuriStatusOk);
 }
 
 static void furi_record_unlock() {
+    if(furi_mutex_release(furi_record->mutex) == FuriStatusOk) {}
     // furi_check(furi_mutex_release(furi_record->mutex) == FuriStatusOk);
 }
 
@@ -88,7 +90,7 @@ void furi_record_create(const char* name, void* data) {
     FuriRecordData* record_data = furi_record_data_get_or_create(name);
     // furi_assert(record_data->data == NULL);
     record_data->data = data;
-    // furi_event_flag_set(record_data->flags, FURI_RECORD_FLAG_READY);
+    furi_event_flag_set(record_data->flags, FURI_RECORD_FLAG_READY);
 
     furi_record_unlock();
 }
@@ -123,12 +125,13 @@ void* furi_record_open(const char* name) {
     furi_record_unlock();
 
     // Wait for record to become ready
-    // furi_check(
-        // furi_event_flag_wait(
-        //     record_data->flags,
-        //     FURI_RECORD_FLAG_READY,
-        //     FuriFlagWaitAny | FuriFlagNoClear,
-        //     FuriWaitForever) == FURI_RECORD_FLAG_READY);
+    if(furi_event_flag_wait(
+            record_data->flags,
+            FURI_RECORD_FLAG_READY,
+            FuriFlagWaitAny | FuriFlagNoClear,
+            FuriWaitForever) == FURI_RECORD_FLAG_READY) {
+
+            }
 
     return record_data->data;
 }

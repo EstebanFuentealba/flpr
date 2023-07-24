@@ -39,7 +39,7 @@ void input_press_timer_callback(void* arg) {
 
 void input_isr(void* _ctx) {
     // UNUSED(_ctx);
-    // furi_thread_flags_set(input->thread_id, INPUT_THREAD_FLAG_ISR);
+    furi_thread_flags_set(input->thread_id, INPUT_THREAD_FLAG_ISR);
 }
 
 const char* input_get_key_name(InputKey key) {
@@ -114,59 +114,60 @@ int32_t input_srv(void* p) {
 
     while(1) {
         bool is_changing = false;
-//         for(size_t i = 0; i < input_pins_count; i++) {
-//             bool state = GPIO_Read(input->pin_states[i]);
-//             if(state) {
-//                 if(input->pin_states[i].debounce < INPUT_DEBOUNCE_TICKS)
-//                     input->pin_states[i].debounce += 1;
-//             } else {
-//                 if(input->pin_states[i].debounce > 0) input->pin_states[i].debounce -= 1;
-//             }
+        for(size_t i = 0; i < input_pins_count; i++) {
+            bool state = GPIO_Read(input->pin_states[i]);
+            
+            if(state) {
+                // Serial.println("state: ");
+                // Serial.println(state);
+                // Serial.println("pin: ");
+                // Serial.println(input->pin_states[i].pin->name);
+                if(input->pin_states[i].debounce < INPUT_DEBOUNCE_TICKS)
+                    input->pin_states[i].debounce += 1;
+            } else {
+                if(input->pin_states[i].debounce > 0) input->pin_states[i].debounce -= 1;
+            }
 
-//             if(input->pin_states[i].debounce > 0 &&
-//                input->pin_states[i].debounce < INPUT_DEBOUNCE_TICKS) {
-//                 is_changing = true;
-//             } else if(input->pin_states[i].state != state) {
-//                 input->pin_states[i].state = state;
+            if(input->pin_states[i].debounce > 0 &&
+               input->pin_states[i].debounce < INPUT_DEBOUNCE_TICKS) {
+                is_changing = true;
+            } else if(input->pin_states[i].state != state) {
+                input->pin_states[i].state = state;
 
-//                 // Common state info
-//                 InputEvent event;
-//                 event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
-//                 event.key = input->pin_states[i].pin->key;
+                // Common state info
+                InputEvent event;
+                event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
+                event.key = input->pin_states[i].pin->key;
 
-//                 // Short / Long / Repeat timer routine
-//                 if(state) {
-//                     input->counter++;
-//                     input->pin_states[i].counter = input->counter;
-//                     event.sequence_counter = input->pin_states[i].counter;
-//                     input_timer_start(input->pin_states[i].press_timer, INPUT_PRESS_TICKS);
-//                 } else {
-//                     event.sequence_counter = input->pin_states[i].counter;
-//                     input_timer_stop(input->pin_states[i].press_timer);
-//                     if(input->pin_states[i].press_counter < INPUT_LONG_PRESS_COUNTS) {
-//                         event.type = InputTypeShort;
-//                         furi_pubsub_publish(input->event_pubsub, &event);
-//                     }
-//                     input->pin_states[i].press_counter = 0;
-//                 }
+                // Short / Long / Repeat timer routine
+                if(state) {
+                    input->counter++;
+                    input->pin_states[i].counter = input->counter;
+                    event.sequence_counter = input->pin_states[i].counter;
+                    input_timer_start(input->pin_states[i].press_timer, INPUT_PRESS_TICKS);
+                } else {
+                    event.sequence_counter = input->pin_states[i].counter;
+                    input_timer_stop(input->pin_states[i].press_timer);
+                    if(input->pin_states[i].press_counter < INPUT_LONG_PRESS_COUNTS) {
+                        event.type = InputTypeShort;
+                        furi_pubsub_publish(input->event_pubsub, &event);
+                    }
+                    input->pin_states[i].press_counter = 0;
+                }
 
-//                 // Send Press/Release event
-//                 event.type = input->pin_states[i].state ? InputTypePress : InputTypeRelease;
-//                 furi_pubsub_publish(input->event_pubsub, &event);
-//             }
-//         }
+                // Send Press/Release event
+                event.type = input->pin_states[i].state ? InputTypePress : InputTypeRelease;
+                furi_pubsub_publish(input->event_pubsub, &event);
+                Serial.println("Send Press/Release event");
+                Serial.println(event.type);
+            }
+        }
 
-//         if(is_changing) {
-// #if INPUT_DEBUG
-//             furi_hal_gpio_write(&gpio_ext_pa4, 1);
-// #endif
-//             furi_delay_tick(1);
-//         } else {
-// #if INPUT_DEBUG
-//             furi_hal_gpio_write(&gpio_ext_pa4, 0);
-// #endif
-//             furi_thread_flags_wait(INPUT_THREAD_FLAG_ISR, FuriFlagWaitAny, FuriWaitForever);
-//         }
+        // if(is_changing) {
+            furi_delay_tick(1);
+        // } else {
+        //     furi_thread_flags_wait(INPUT_THREAD_FLAG_ISR, FuriFlagWaitAny, 1000 /*FuriWaitForever*/);
+        // }
     }
 
     return 0;

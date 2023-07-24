@@ -232,8 +232,7 @@ void furi_thread_start(FuriThread* thread) {
             Serial.println("[thread] try xTaskCreate");
         
             // BaseType_t result = xTaskCreatePinnedToCore((TaskFunction_t)thread->callback, thread->name, 2048, NULL, configMAX_PRIORITIES - 1, NULL, 1);
-            // thread->task_handle = 
-            (TaskHandle_t)xTaskCreatePinnedToCore((TaskFunction_t)thread->callback, thread->name, 2048, NULL, thread->priority, NULL, 0);
+         thread->task_handle =  (TaskHandle_t)xTaskCreatePinnedToCore((TaskFunction_t)thread->callback, thread->name, 2048, NULL, thread->priority, NULL, 0);
             // thread->task_handle = (TaskHandle_t)xTaskCreatePinnedToCore((TaskFunction_t)thread->callback, thread->name, thread->stack_size / sizeof(StackType_t), NULL, thread->priority, &thread->context, 1);
             // BaseType_t result = (BaseType_t)xTaskCreateStatic(furi_thread_body,
             //     thread->name,

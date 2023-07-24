@@ -9,7 +9,7 @@
 
 typedef struct {
     void* data;
-    // FuriMutex* mutex;
+    FuriMutex* mutex;
 } ViewModelLocking;
 
 struct View {
