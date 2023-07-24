@@ -1,22 +1,22 @@
-// #include "applications.h"
-// #include "flipper_format.h"
-// #include "furi.h"
-// #include "furi_hal.h"
-// #include "storage.h"
-// #include "dir_walk.h"
-// #include "SD.h"
-// #define MAX_NAME_LENGTH 255
-// #define HARDCODED_ANIMATION_NAME "L1_Tv_128x47"
-// #define ANIMATION_META_FILE "meta.txt"
-// #define ANIMATION_DIR "/dolphin"
-// #define ANIMATION_MANIFEST_FILE ANIMATION_DIR "/manifest.txt"
+#include "applications.h"
+#include "flipper_format.h"
+#include "furi.h"
+#include "furi_hal.h"
+#include "storage.h"
+#include "dir_walk.h"
+#include "SD.h"
+#define MAX_NAME_LENGTH 255
+#define HARDCODED_ANIMATION_NAME "L1_Tv_128x47"
+#define ANIMATION_META_FILE "meta.txt"
+#define ANIMATION_DIR "/dolphin"
+#define ANIMATION_MANIFEST_FILE ANIMATION_DIR "/manifest.txt"
 
 
 void setup() {
   Serial.begin(115200);
   Serial.println("setup");
 
-  /*
+  
   // Initialize FURI layer
   furi_init();
   // // Flipper FURI HAL
@@ -47,7 +47,7 @@ void setup() {
   
   //  Run Kernel
   furi_run();
-  */
+  
 
 
   // Serial.println("try furi_record_open");
