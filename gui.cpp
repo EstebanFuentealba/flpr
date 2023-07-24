@@ -381,11 +381,17 @@ static void gui_input(Gui* gui, InputEvent* input_event) {
 
 void gui_lock(Gui* gui) {
     // furi_assert(gui);
+    if(furi_mutex_acquire(gui->mutex, FuriWaitForever) == FuriStatusOk) {
+
+    }
     // furi_check(furi_mutex_acquire(gui->mutex, FuriWaitForever) == FuriStatusOk);
 }
 
 void gui_unlock(Gui* gui) {
     // furi_assert(gui);
+    if(furi_mutex_release(gui->mutex) == FuriStatusOk) {
+
+    }
     // furi_check(furi_mutex_release(gui->mutex) == FuriStatusOk);
 }
 
@@ -571,10 +577,11 @@ void gui_direct_draw_release(Gui* gui) {
 Gui* gui_alloc() {
     Gui* gui = (Gui*)malloc(sizeof(Gui));
     // // Thread ID
-    // gui->thread_id = furi_thread_get_current_id();
+    gui->thread_id = furi_thread_get_current_id();
     // // Allocate mutex
-    // gui->mutex = furi_mutex_alloc(FuriMutexTypeNormal);
+    gui->mutex = furi_mutex_alloc(FuriMutexTypeNormal);
     // furi_check(gui->mutex);
+    Serial.println("[gui] ViewPortArray_init");
     // Layers
     for(size_t i = 0; i < GuiLayerMAX; i++) {
         ViewPortArray_init(gui->layers[i]);
@@ -601,17 +608,19 @@ Gui* gui_setup() {
 void gui_loop(Gui* gui) {
     gui_redraw(gui);
 }
-/*
+
 int32_t gui_srv(void* p) {
     // UNUSED(p);
     Gui* gui = gui_alloc();
-
+    Serial.println("[gui] gui_alloc");
     furi_record_create(RECORD_GUI, gui);
-
+    furi_thread_flags_set(gui->thread_id, GUI_THREAD_FLAG_DRAW);
+  
     while(1) {
-        uint32_t flags =
-            furi_thread_flags_wait(GUI_THREAD_FLAG_ALL, FuriFlagWaitAny, FuriWaitForever);
-        // Process and dispatch input
+        uint32_t flags = furi_thread_flags_wait(GUI_THREAD_FLAG_ALL, FuriFlagWaitAny, FuriWaitForever);
+    //     Serial.println("flags:");
+    //      Serial.println(flags);
+    //     // Process and dispatch input
         if(flags & GUI_THREAD_FLAG_INPUT) {
             // Process till queue become empty
             InputEvent input_event;
@@ -629,4 +638,3 @@ int32_t gui_srv(void* p) {
 
     return 0;
 }
-*/

@@ -7,8 +7,8 @@ const char* FLIPPER_AUTORUN_APP_NAME = "";
 // extern int32_t dialogs_srv(void* p);
 // extern int32_t dolphin_srv(void* p);
 // extern int32_t desktop_srv(void* p);
-// extern int32_t gui_srv(void* p);
-// extern int32_t input_srv(void* p);
+extern int32_t gui_srv(void* p);
+extern int32_t input_srv(void* p);
 // extern int32_t loader_srv(void* p);
 // extern int32_t notification_srv(void* p);
 // extern int32_t power_srv(void* p);
@@ -50,20 +50,20 @@ const FlipperInternalApplication FLIPPER_SERVICES[] = {
 //     //  .icon = NULL,
 //     //  .flags = FlipperApplicationFlagDefault },
 
-    // {
-    // //  .app = gui_srv,
-    //  .name = "GuiSrv",
-    //  .appid = "gui", 
-    //  .stack_size = 2048,
-    //  .icon = NULL,
-    //  .flags = FlipperInternalApplicationFlagDefault },
+    {
+     .app = gui_srv,
+     .name = "GuiSrv",
+     .appid = "gui", 
+     .stack_size = 1024,
+     .icon = NULL,
+     .flags = FlipperInternalApplicationFlagDefault },
 
-//     // {.app = input_srv,
-//     //  .name = "InputSrv",
-//     //  .appid = "input", 
-//     //  .stack_size = 1024,
-//     //  .icon = NULL,
-//     //  .flags = FlipperApplicationFlagDefault },
+    {.app = input_srv,
+     .name = "InputSrv",
+     .appid = "input", 
+     .stack_size = 1024,
+     .icon = NULL,
+     .flags = FlipperInternalApplicationFlagDefault },
 
 //     // {.app = loader_srv,
 //     //  .name = "LoaderSrv",

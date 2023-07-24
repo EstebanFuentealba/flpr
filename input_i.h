@@ -31,7 +31,7 @@ typedef struct {
 
 /** Input state */
 typedef struct {
-    // FuriThreadId thread_id;
+    FuriThreadId thread_id;
     FuriPubSub* event_pubsub;
     InputPinState* pin_states;
     // Cli* cli;

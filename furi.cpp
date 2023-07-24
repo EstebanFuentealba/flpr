@@ -24,5 +24,9 @@ void furi_run() {
     // #ifdef RUN_THREAD
     // vTaskStartScheduler();
     // #endif
-    
+    // if(xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED) {
+        // Iniciar el planificador de tareas de FreeRTOS
+        // vTaskStartScheduler();
+    // }
+    Serial.println("[furi] furi_run");
 }

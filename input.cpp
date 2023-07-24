@@ -21,7 +21,7 @@ inline static void input_timer_stop(FuriTimer* timer_id) {
 }
 
 void input_press_timer_callback(void* arg) {
-    InputPinState* input_pin = arg;
+    InputPinState* input_pin = (InputPinState*)arg;
     InputEvent event;
     event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
     event.sequence_counter = input_pin->counter;
@@ -69,11 +69,11 @@ const char* input_get_type_name(InputType type) {
 }
 
 void input_setup() {
-    input = malloc(sizeof(Input));
+    input = (Input *)malloc(sizeof(Input));
     input->event_pubsub = furi_pubsub_alloc();
     furi_record_create(RECORD_INPUT_EVENTS, input->event_pubsub);
 
-    input->pin_states = malloc(input_pins_count * sizeof(InputPinState));
+    input->pin_states = (InputPinState*) malloc(input_pins_count * sizeof(InputPinState));
 
     for(size_t i = 0; i < input_pins_count; i++) {
         furi_hal_gpio_add_int_callback(input_pins[i].gpio, input_isr, NULL);
@@ -91,25 +91,16 @@ void input_loop() {
     
 }
 
-/*
 
 int32_t input_srv(void* p) {
-    UNUSED(p);
-    input = malloc(sizeof(Input));
+
+    input = (Input*)malloc(sizeof(Input));
+    Serial.println("[input] input_srv");
     input->thread_id = furi_thread_get_current_id();
     input->event_pubsub = furi_pubsub_alloc();
     furi_record_create(RECORD_INPUT_EVENTS, input->event_pubsub);
 
-#if INPUT_DEBUG
-    furi_hal_gpio_init_simple(&gpio_ext_pa4, GpioModeOutputPushPull);
-#endif
-
-#ifdef SRV_CLI
-    input->cli = furi_record_open(RECORD_CLI);
-    cli_add_command(input->cli, "input", CliCommandFlagParallelSafe, input_cli, input);
-#endif
-
-    input->pin_states = malloc(input_pins_count * sizeof(InputPinState));
+    input->pin_states = (InputPinState *)malloc(input_pins_count * sizeof(InputPinState));
 
     for(size_t i = 0; i < input_pins_count; i++) {
         furi_hal_gpio_add_int_callback(input_pins[i].gpio, input_isr, NULL);
@@ -123,61 +114,60 @@ int32_t input_srv(void* p) {
 
     while(1) {
         bool is_changing = false;
-        for(size_t i = 0; i < input_pins_count; i++) {
-            bool state = GPIO_Read(input->pin_states[i]);
-            if(state) {
-                if(input->pin_states[i].debounce < INPUT_DEBOUNCE_TICKS)
-                    input->pin_states[i].debounce += 1;
-            } else {
-                if(input->pin_states[i].debounce > 0) input->pin_states[i].debounce -= 1;
-            }
+//         for(size_t i = 0; i < input_pins_count; i++) {
+//             bool state = GPIO_Read(input->pin_states[i]);
+//             if(state) {
+//                 if(input->pin_states[i].debounce < INPUT_DEBOUNCE_TICKS)
+//                     input->pin_states[i].debounce += 1;
+//             } else {
+//                 if(input->pin_states[i].debounce > 0) input->pin_states[i].debounce -= 1;
+//             }
 
-            if(input->pin_states[i].debounce > 0 &&
-               input->pin_states[i].debounce < INPUT_DEBOUNCE_TICKS) {
-                is_changing = true;
-            } else if(input->pin_states[i].state != state) {
-                input->pin_states[i].state = state;
+//             if(input->pin_states[i].debounce > 0 &&
+//                input->pin_states[i].debounce < INPUT_DEBOUNCE_TICKS) {
+//                 is_changing = true;
+//             } else if(input->pin_states[i].state != state) {
+//                 input->pin_states[i].state = state;
 
-                // Common state info
-                InputEvent event;
-                event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
-                event.key = input->pin_states[i].pin->key;
+//                 // Common state info
+//                 InputEvent event;
+//                 event.sequence_source = INPUT_SEQUENCE_SOURCE_HARDWARE;
+//                 event.key = input->pin_states[i].pin->key;
 
-                // Short / Long / Repeat timer routine
-                if(state) {
-                    input->counter++;
-                    input->pin_states[i].counter = input->counter;
-                    event.sequence_counter = input->pin_states[i].counter;
-                    input_timer_start(input->pin_states[i].press_timer, INPUT_PRESS_TICKS);
-                } else {
-                    event.sequence_counter = input->pin_states[i].counter;
-                    input_timer_stop(input->pin_states[i].press_timer);
-                    if(input->pin_states[i].press_counter < INPUT_LONG_PRESS_COUNTS) {
-                        event.type = InputTypeShort;
-                        furi_pubsub_publish(input->event_pubsub, &event);
-                    }
-                    input->pin_states[i].press_counter = 0;
-                }
+//                 // Short / Long / Repeat timer routine
+//                 if(state) {
+//                     input->counter++;
+//                     input->pin_states[i].counter = input->counter;
+//                     event.sequence_counter = input->pin_states[i].counter;
+//                     input_timer_start(input->pin_states[i].press_timer, INPUT_PRESS_TICKS);
+//                 } else {
+//                     event.sequence_counter = input->pin_states[i].counter;
+//                     input_timer_stop(input->pin_states[i].press_timer);
+//                     if(input->pin_states[i].press_counter < INPUT_LONG_PRESS_COUNTS) {
+//                         event.type = InputTypeShort;
+//                         furi_pubsub_publish(input->event_pubsub, &event);
+//                     }
+//                     input->pin_states[i].press_counter = 0;
+//                 }
 
-                // Send Press/Release event
-                event.type = input->pin_states[i].state ? InputTypePress : InputTypeRelease;
-                furi_pubsub_publish(input->event_pubsub, &event);
-            }
-        }
+//                 // Send Press/Release event
+//                 event.type = input->pin_states[i].state ? InputTypePress : InputTypeRelease;
+//                 furi_pubsub_publish(input->event_pubsub, &event);
+//             }
+//         }
 
-        if(is_changing) {
-#if INPUT_DEBUG
-            furi_hal_gpio_write(&gpio_ext_pa4, 1);
-#endif
-            furi_delay_tick(1);
-        } else {
-#if INPUT_DEBUG
-            furi_hal_gpio_write(&gpio_ext_pa4, 0);
-#endif
-            furi_thread_flags_wait(INPUT_THREAD_FLAG_ISR, FuriFlagWaitAny, FuriWaitForever);
-        }
+//         if(is_changing) {
+// #if INPUT_DEBUG
+//             furi_hal_gpio_write(&gpio_ext_pa4, 1);
+// #endif
+//             furi_delay_tick(1);
+//         } else {
+// #if INPUT_DEBUG
+//             furi_hal_gpio_write(&gpio_ext_pa4, 0);
+// #endif
+//             furi_thread_flags_wait(INPUT_THREAD_FLAG_ISR, FuriFlagWaitAny, FuriWaitForever);
+//         }
     }
 
     return 0;
 }
-*/

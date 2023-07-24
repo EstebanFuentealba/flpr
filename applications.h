@@ -9,7 +9,7 @@ typedef enum {
 } FlipperInternalApplicationFlag;
 
 typedef struct {
-    // const FuriThreadCallback app;
+    const FuriThreadCallback app;
     const char* name;
     const char* appid;
     const size_t stack_size;

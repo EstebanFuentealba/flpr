@@ -5,11 +5,83 @@
 #include "storage.h"
 #include "dir_walk.h"
 #include "SD.h"
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+
 #define MAX_NAME_LENGTH 255
 #define HARDCODED_ANIMATION_NAME "L1_Tv_128x47"
 #define ANIMATION_META_FILE "meta.txt"
 #define ANIMATION_DIR "/dolphin"
 #define ANIMATION_MANIFEST_FILE ANIMATION_DIR "/manifest.txt"
+
+
+
+void flipper_init() {
+    // flipper_print_version("Firmware", furi_hal_version_get_firmware_version());
+
+    Serial.printf("Boot mode %d, starting services", 1);
+
+    for(size_t i = 0; i < FLIPPER_SERVICES_COUNT; i++) {
+        Serial.printf("Starting service %s", FLIPPER_SERVICES[i].name);
+
+        FuriThread* thread = furi_thread_alloc_ex(
+            FLIPPER_SERVICES[i].name,
+            FLIPPER_SERVICES[i].stack_size,
+            FLIPPER_SERVICES[i].app,
+            NULL);
+        furi_thread_mark_as_service(thread);
+        furi_thread_set_appid(thread, FLIPPER_SERVICES[i].appid);
+
+        furi_thread_start(thread);
+    }
+
+    
+
+    Serial.println("Startup complete");
+}
+
+int32_t init_task(void* context) {
+    // UNUSED(context);
+
+    // Flipper FURI HAL
+    furi_hal_init();
+
+    // Init flipper
+    flipper_init();
+
+    return 0;
+}
+
+void main_task(void *pvParameter)
+{
+    while(1) {
+        printf( "%s\n", "Task1" ); //CONFIG_HELLO_MESSAGE );
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
+    }
+}
+
+void main_task2(void *pvParameter)
+{
+    while(1) {
+        printf( "%s\n", "Task2" );
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
+    }
+}
+
+void main_task3(void *pvParameter)
+{
+    while(1) {
+        printf( "%s\n", "Task3" );
+
+        vTaskDelay(1000 / portTICK_RATE_MS);
+    }
+}
 
 
 void setup() {
@@ -22,31 +94,33 @@ void setup() {
   // // Flipper FURI HAL
   furi_hal_init();
   FuriPubSub* pubsub = furi_pubsub_alloc();
+
+  // FuriThread* main_thread = furi_thread_alloc_ex("Init", 512, init_task, NULL);
+
   
+  // furi_thread_start(main_thread);
+
+  // Flipper FURI HAL
+  // furi_hal_init();
+
+  // Init flipper
+  flipper_init();
+  // xTaskCreatePinnedToCore(&main_task, "main_task", 2048, NULL, 1, NULL, 0);
+  //   xTaskCreatePinnedToCore(&main_task2, "main_task2", 2048, NULL, 5, NULL, 0);
+  //   xTaskCreatePinnedToCore(&main_task3, "main_task3", 2048, NULL, 9, NULL, 0);
+
+  
+
+  furi_delay_ms(100);
   // app_storage_setup();
   // app_input_setup();
   // app_gui_setup();
   // app_desktop_setup();
 
-  Serial.println("Boot mode Normal, starting services");
-
-  // for(size_t i = 0; i < FLIPPER_SERVICES_COUNT; i++) {
-  //     Serial.printf("Starting service %s", FLIPPER_SERVICES[i].name);
-
-  //     FuriThread* thread = furi_thread_alloc_ex(
-  //         FLIPPER_SERVICES[i].name,
-  //         FLIPPER_SERVICES[i].stack_size,
-  //         FLIPPER_SERVICES[i].app,
-  //         NULL);
-  //     furi_thread_mark_as_service(thread);
-  //     furi_thread_set_appid(thread, FLIPPER_SERVICES[i].appid);
-
-  //     furi_thread_start(thread);
-  // }
-  Serial.println("Startup complete");
+  
   
   //  Run Kernel
-  furi_run();
+  // furi_run();
   
 
 

@@ -5,16 +5,16 @@
 
 #include <stdlib.h>
 #include "common_defines.h"
-// #include "event_flag.h"
+#include "event_flag.h"
 #include "kernel.h"
 // #include "memmgr.h"
 // #include "memmgr_heap.h"
 // #include "message_queue.h"
-// #include "mutex.h"
+#include "mutex.h"
 #include "pubsub.h"
 #include "record.h"
 // #include "semaphore.h"
-// #include "thread.h"
+#include "thread.h"
 #include "timer.h"
 
 #include "furi_hal_gpio.h"
