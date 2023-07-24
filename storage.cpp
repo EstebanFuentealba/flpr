@@ -6,38 +6,38 @@
 #include "storage_glue.h"
 #include "storage_ext.h"
 #include "icon_i.h"
-// #include <assets_icons.h>
+#include "assets_icons.h"
 
 #define STORAGE_TICK 1000
 
 
 // 'SDcardMounted_11x8', 11x8px
-const unsigned char SDcardMounted_11x8_bitmap_SDcardMounted_11x8 [] PROGMEM = {
-	0xff, 0xe0, 0xff, 0x20, 0xff, 0xe0, 0xff, 0x20, 0xff, 0xe0, 0xff, 0x20, 0xff, 0xe0, 0xe6, 0x00
-};
-const uint8_t* const frame_SDcardMounted_11x8_bitmap_SDcardMounted_11x8[] = { SDcardMounted_11x8_bitmap_SDcardMounted_11x8 };
+// const unsigned char SDcardMounted_11x8_bitmap_SDcardMounted_11x8 [] PROGMEM = {
+// 	0xff, 0xe0, 0xff, 0x20, 0xff, 0xe0, 0xff, 0x20, 0xff, 0xe0, 0xff, 0x20, 0xff, 0xe0, 0xe6, 0x00
+// };
+// const uint8_t* const frame_SDcardMounted_11x8_bitmap_SDcardMounted_11x8[] = { SDcardMounted_11x8_bitmap_SDcardMounted_11x8 };
 
-Icon I_SDcardMounted_11x8 = {
-    .width = 11,
-    .height = 8,
-    .frame_count = 1,
-    .frame_rate = 1,
-    .frames = frame_SDcardMounted_11x8_bitmap_SDcardMounted_11x8
-};
+// Icon I_SDcardMounted_11x8 = {
+//     .width = 11,
+//     .height = 8,
+//     .frame_count = 1,
+//     .frame_rate = 1,
+//     .frames = frame_SDcardMounted_11x8_bitmap_SDcardMounted_11x8
+// };
 
-// 'SDcardFail_11x8', 11x8px
-const unsigned char SDcardFail_11x8_bitmap_SDcardFail_11x8 [] PROGMEM = {
-	0xff, 0xe0, 0xed, 0xe0, 0xff, 0xe0, 0xe1, 0xe0, 0xde, 0xe0, 0xff, 0xe0, 0xff, 0xe0, 0xe6, 0x00
-};
-const uint8_t* const frame_SDcardFail_11x8_bitmap_SDcardFail_11x8[] = { SDcardFail_11x8_bitmap_SDcardFail_11x8 };
+// // 'SDcardFail_11x8', 11x8px
+// const unsigned char SDcardFail_11x8_bitmap_SDcardFail_11x8 [] PROGMEM = {
+// 	0xff, 0xe0, 0xed, 0xe0, 0xff, 0xe0, 0xe1, 0xe0, 0xde, 0xe0, 0xff, 0xe0, 0xff, 0xe0, 0xe6, 0x00
+// };
+// const uint8_t* const frame_SDcardFail_11x8_bitmap_SDcardFail_11x8[] = { SDcardFail_11x8_bitmap_SDcardFail_11x8 };
 
-Icon I_SDcardFail_11x8 = {
-    .width = 11,
-    .height = 8,
-    .frame_count = 1,
-    .frame_rate = 1,
-    .frames = frame_SDcardFail_11x8_bitmap_SDcardFail_11x8
-};
+// Icon I_SDcardFail_11x8 = {
+//     .width = 11,
+//     .height = 8,
+//     .frame_count = 1,
+//     .frame_rate = 1,
+//     .frames = frame_SDcardFail_11x8_bitmap_SDcardFail_11x8
+// };
 
 #define ICON_SD_MOUNTED &I_SDcardMounted_11x8
 #define ICON_SD_ERROR &I_SDcardFail_11x8

@@ -1,33 +1,53 @@
-#include "flipper_format.h"
-#include "furi.h"
-#include "furi_hal.h"
-#include "storage.h"
-#include "dir_walk.h"
-#include "SD.h"
-
-#define MAX_NAME_LENGTH 255
-#define HARDCODED_ANIMATION_NAME "L1_Tv_128x47"
-#define ANIMATION_META_FILE "meta.txt"
-#define ANIMATION_DIR "/dolphin"
-#define ANIMATION_MANIFEST_FILE ANIMATION_DIR "/manifest.txt"
+// #include "applications.h"
+// #include "flipper_format.h"
+// #include "furi.h"
+// #include "furi_hal.h"
+// #include "storage.h"
+// #include "dir_walk.h"
+// #include "SD.h"
+// #define MAX_NAME_LENGTH 255
+// #define HARDCODED_ANIMATION_NAME "L1_Tv_128x47"
+// #define ANIMATION_META_FILE "meta.txt"
+// #define ANIMATION_DIR "/dolphin"
+// #define ANIMATION_MANIFEST_FILE ANIMATION_DIR "/manifest.txt"
 
 
 void setup() {
   Serial.begin(115200);
   Serial.println("setup");
 
-
+  /*
   // Initialize FURI layer
   furi_init();
   // // Flipper FURI HAL
   furi_hal_init();
   FuriPubSub* pubsub = furi_pubsub_alloc();
-  app_storage_setup();
-  app_input_setup();
-  app_gui_setup();
+  
+  // app_storage_setup();
+  // app_input_setup();
+  // app_gui_setup();
+  // app_desktop_setup();
 
+  Serial.println("Boot mode Normal, starting services");
+
+  // for(size_t i = 0; i < FLIPPER_SERVICES_COUNT; i++) {
+  //     Serial.printf("Starting service %s", FLIPPER_SERVICES[i].name);
+
+  //     FuriThread* thread = furi_thread_alloc_ex(
+  //         FLIPPER_SERVICES[i].name,
+  //         FLIPPER_SERVICES[i].stack_size,
+  //         FLIPPER_SERVICES[i].app,
+  //         NULL);
+  //     furi_thread_mark_as_service(thread);
+  //     furi_thread_set_appid(thread, FLIPPER_SERVICES[i].appid);
+
+  //     furi_thread_start(thread);
+  // }
+  Serial.println("Startup complete");
+  
   //  Run Kernel
   furi_run();
+  */
 
 
   // Serial.println("try furi_record_open");
@@ -40,13 +60,13 @@ void setup() {
   // } else {
   //     Serial.println(F("Mounted SD Card"));
   // }
-
+   /*
   //  ### [ESCRIBE ARCHIVO DEMO]
-
+ 
   const char* name = "L3_Furippa3_128x64";
 
   Serial.println("try storage_file_alloc");
-  Storage* storage = furi_record_open(RECORD_STORAGE);
+  Storage* storage = (Storage*)furi_record_open(RECORD_STORAGE);
   bool isCreated = storage_simply_mkdir(storage, "/dolphin");
   Serial.println("isCreated:");
   Serial.println(isCreated);
@@ -110,102 +130,16 @@ void setup() {
   storage_dir_close(dir);
   storage_file_free(dir);
   //  ### [/LISTA DIRECTORIOS]
-
-
-  /*
-  FlipperFormat* file = flipper_format_file_alloc(storage);
-  flipper_format_set_strict_mode(file, true);
-  Serial.println("flipper_format_set_strict_mode");
-  FuriString* read_string;
-  read_string = furi_string_alloc();
-
-
-  uint32_t u32value;
-  flipper_format_file_open_existing(file, ANIMATION_MANIFEST_FILE);
-  
-  Serial.println("flipper_format_file_open_existing");
-
-  if(flipper_format_read_header(file, read_string, &u32value)){
-    if(!furi_string_cmp(read_string, furi_string_alloc_set_str("Flipper Animation Manifest"))) {
-      flipper_format_set_strict_mode(file, false);
-      while(flipper_format_read_string(file, "Name", read_string) &&
-            furi_string_cmp(read_string, furi_string_alloc_set_str(name)))
-          ;
-    }
-  } else {
-    Serial.println("NO flipper_format_read_header");
-  }
-
-  
-
-  
-  
-  
-    Serial.print("name: ");
-    Serial.println(furi_string_get_cstr(read_string));
-
-   if(flipper_format_read_uint32(file, "Min butthurt", &u32value, 1)) {
-    Serial.print("Min butthurt: ");
-    Serial.println(u32value);
-   }
-    if(flipper_format_read_uint32(file, "Max butthurt", &u32value, 1)) {
-    Serial.print("Max butthurt: ");
-    Serial.println(u32value);
-   }
-     if(flipper_format_read_uint32(file, "Min level", &u32value, 1)) {
-    Serial.print("Min level: ");
-    Serial.println(u32value);
-   }
-   if(flipper_format_read_uint32(file, "Max level", &u32value, 1)) {
-    Serial.print("Max level: ");
-    Serial.println(u32value);
-   }
-   if(flipper_format_read_uint32(file, "Weight", &u32value, 1)) {
-    Serial.print("Weight: ");
-    Serial.println(u32value);
-   }
-
-
-  Serial.println("flipper_format_file_close");
-  flipper_format_file_close(file);
-  */
-
-  // // StorageAnimation* animation_storage_find_animation(HARDCODED_ANIMATION_NAME)
-  // StorageAnimation* new_animation = animation_manager_select_idle_animation(animation_manager);
-  // animation_manager_replace_current_animation(animation_manager, new_animation);
-  // const BubbleAnimation* bubble_animation =
-  //     animation_storage_get_bubble_animation(animation_manager->current_animation);
-  // animation_manager->state = AnimationManagerStateIdle;
-  // furi_timer_start(animation_manager->idle_animation_timer, bubble_animation->duration * 1000);
-
-  // flipper_format_set_strict_mode(file, true);
-
-  // manifest_info->name = malloc(furi_string_size(read_string) + 1);
-  // strcpy((char*)manifest_info->name, furi_string_get_cstr(read_string));
-
-  // if(!flipper_format_read_uint32(file, "Min butthurt", &u32value, 1)) break;
-  // manifest_info->min_butthurt = u32value;
-  // if(!flipper_format_read_uint32(file, "Max butthurt", &u32value, 1)) break;
-  // manifest_info->max_butthurt = u32value;
-  // if(!flipper_format_read_uint32(file, "Min level", &u32value, 1)) break;
-  // manifest_info->min_level = u32value;
-  // if(!flipper_format_read_uint32(file, "Max level", &u32value, 1)) break;
-  // manifest_info->max_level = u32value;
-  // if(!flipper_format_read_uint32(file, "Weight", &u32value, 1)) break;
-  // manifest_info->weight = u32value;
-
-
-    
-  // storage_dir_close(file);
-  // storage_file_free(file);
   furi_record_close(RECORD_STORAGE);
 
-    
+    */
     
 }
 void loop() {
-  app_storage_loop();
-  app_input_loop();
-  app_gui_loop();
+
+  // app_storage_loop();
+  // app_input_loop();
+  // app_gui_loop();
+  // app_desktop_loop();
 }
 

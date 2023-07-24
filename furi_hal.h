@@ -37,12 +37,12 @@
 // #include <furi_hal_usb_hid.h>
 // #include <furi_hal_uart.h>
 // #include <furi_hal_info.h>
-// #include <furi_hal_random.h>
+#include "furi_hal_random.h"
 // #include <furi_hal_target_hw.h>
 
-// #ifdef __cplusplus
-// extern "C" {
-// #endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** Early FuriHal init, only essential subsystems */
 void furi_hal_init_early();
@@ -59,6 +59,6 @@ void furi_hal_init();
  */
 void furi_hal_switch(void* address);
 
-// #ifdef __cplusplus
-// }
-// #endif
+#ifdef __cplusplus
+}
+#endif

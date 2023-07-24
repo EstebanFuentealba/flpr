@@ -8,7 +8,7 @@
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-// #include "compress.h"
+#include "compress.h"
 #include "canvas.h"
 
 // OLED display width, in pixels
@@ -31,7 +31,7 @@ struct Canvas {
     uint8_t offset_y;
     uint8_t width;
     uint8_t height;
-    // CompressIcon* compress_icon;
+    CompressIcon* compress_icon;
 };
 
 /** Allocate memory and initialize canvas
@@ -111,3 +111,22 @@ CanvasOrientation canvas_get_orientation(const Canvas* canvas);
 //     const uint8_t* bitmap,
 //     uint8_t rotation);
 void canvas_set_color_white(Canvas* canvas);
+
+/** Draw a u8g2 bitmap
+ *
+ * @param      canvas   Canvas instance
+ * @param      x        x coordinate
+ * @param      y        y coordinate
+ * @param      width    width
+ * @param      height   height
+ * @param      bitmap   bitmap
+ * @param      rotation rotation
+ */
+void canvas_draw_u8g2_bitmap(
+    Canvas* canvas,
+    uint8_t x,
+    uint8_t y,
+    uint8_t w,
+    uint8_t h,
+    const uint8_t* bitmap,
+    IconRotation rotation);

@@ -1,6 +1,6 @@
 #include "canvas_i.h"
 #include "icon_i.h"
-
+#include "icon_animation_i.h"
 
 #include <SPI.h>
 #include <Wire.h>
@@ -17,13 +17,13 @@ const CanvasFontParameters canvas_font_params[FontTotalNumber] = {
 
 
 
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+// Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI u8g2(SSD1306_SWITCHCAPVCC, /* cs=/ 5, / dc=/ 32, / reset=*/ 4);
  Canvas* canvas_init() {
     Canvas* canvas = new Canvas;
     
-    // canvas->compress_icon = compress_icon_alloc();
+    canvas->compress_icon = compress_icon_alloc();
     canvas->display = new Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
     // canvas->display = new u8g2(U8G2_R0, /* clock=*/SCL, /* data=*/SDA, /* reset=*/U8X8_PIN_NONE);
     // u8g2.begin();
@@ -160,8 +160,119 @@ void canvas_draw_icon(Canvas* canvas, uint8_t x, uint8_t y, const Icon* icon) {
     if (!icon) {
         return;
     }
+     x += canvas->offset_x;
+    y += canvas->offset_y;
+    uint8_t* icon_data = NULL;
+    compress_icon_decode(canvas->compress_icon, icon_get_data(icon), &icon_data);
+    // canvas_draw_bitmap(canvas, x, y, icon->width, icon->height, icon_data);
+    canvas_draw_u8g2_bitmap(canvas, x, y, icon_get_width(icon), icon_get_height(icon), icon_data, IconRotation0);
+}
 
-    canvas_draw_bitmap(canvas, x, y, icon->width, icon->height, icon->frames[0]);
+static void canvas_draw_u8g2_bitmap_int(
+    Adafruit_SSD1306* display,
+    int16_t x,
+    int16_t y,
+    uint16_t w,
+    uint16_t h,
+    bool mirror,
+    bool rotation,
+    const uint8_t* bitmap) {
+
+    int16_t blen = w;
+    blen += 7;
+    blen >>= 3;
+
+    if(rotation && !mirror) {
+        x += w + 1;
+    } else if(mirror && !rotation) {
+        y += h - 1;
+    }
+
+    while(h > 0) {
+        const uint8_t* b = bitmap;
+        uint16_t len = w;
+        int16_t x0 = x;
+        int16_t y0 = y;
+        uint8_t mask;
+        uint16_t color = WHITE; // Set the color you want to use for drawing
+        uint16_t ncolor = BLACK; // Set the color for the background
+        mask = 1;
+
+        while(len > 0) {
+            if(pgm_read_byte(b) & mask) {
+                display->drawPixel(x0, y0, color);
+            } else {
+                if(display->getRotation() == 0) {
+                    display->drawPixel(x0, y0, ncolor);
+                }
+            }
+
+            if(rotation) {
+                y0++;
+            } else {
+                x0++;
+            }
+
+            mask <<= 1;
+            if(mask == 0) {
+                mask = 1;
+                b++;
+            }
+            len--;
+        }
+
+        bitmap += blen;
+
+        if(mirror) {
+            if(rotation) {
+                x++;
+            } else {
+                y--;
+            }
+        } else {
+            if(rotation) {
+                x--;
+            } else {
+                y++;
+            }
+        }
+        h--;
+    }
+}
+
+
+void canvas_draw_u8g2_bitmap(
+    Canvas* canvas,
+    uint8_t x,
+    uint8_t y,
+    uint8_t w,
+    uint8_t h,
+    const uint8_t* bitmap,
+    IconRotation rotation) {
+    uint8_t blen;
+    blen = w;
+    blen += 7;
+    blen >>= 3;
+// #ifdef U8G2_WITH_INTERSECTION
+//     if(u8g2_IsIntersection(u8g2, x, y, x + w, y + h) == 0) return;
+// #endif /* U8G2_WITH_INTERSECTION */
+
+    switch(rotation) {
+    case IconRotation0:
+        canvas_draw_u8g2_bitmap_int(canvas->display, x, y, w, h, 0, 0, bitmap);
+        break;
+    case IconRotation90:
+        canvas_draw_u8g2_bitmap_int(canvas->display, x, y, w, h, 0, 1, bitmap);
+        break;
+    case IconRotation180:
+        canvas_draw_u8g2_bitmap_int(canvas->display, x, y, w, h, 1, 0, bitmap);
+        break;
+    case IconRotation270:
+        canvas_draw_u8g2_bitmap_int(canvas->display, x, y, w, h, 1, 1, bitmap);
+        break;
+    default:
+        break;
+    }
 }
 
 
@@ -495,6 +606,22 @@ void canvas_draw_fast_v_line(Canvas* canvas, uint8_t x, uint8_t y, uint8_t heigh
 void canvas_draw_fast_h_line(Canvas* canvas, uint8_t x, uint8_t y, uint8_t width){
     canvas->display->drawFastHLine(x, y, width, WHITE);
 }
+
+void canvas_draw_icon_animation(
+    Canvas* canvas,
+    uint8_t x,
+    uint8_t y,
+    IconAnimation* icon_animation) {
+    // furi_assert(canvas);
+    // furi_assert(icon_animation);
+
+    x += canvas->offset_x;
+    y += canvas->offset_y;
+    uint8_t* icon_data = NULL;
+    compress_icon_decode(canvas->compress_icon, icon_animation_get_data(icon_animation), &icon_data);
+    canvas_draw_bitmap(canvas, x, y, icon_animation_get_width(icon_animation), icon_animation_get_height(icon_animation), icon_data);
+}
+
 // void canvas_draw_icon_animation(Canvas* canvas, uint8_t x, uint8_t y, const IconAnimation* icon_animation) {
 //     if (!icon_animation) {
 //         return;
@@ -513,3 +640,46 @@ void canvas_draw_fast_h_line(Canvas* canvas, uint8_t x, uint8_t y, uint8_t width
 
 //     canvas_draw_bitmap(canvas, x, y, icon_get_width(icon), icon_get_height(icon), icon_get_data(icon));
 // }
+void canvas_draw_icon_ex(
+    Canvas* canvas,
+    uint8_t x,
+    uint8_t y,
+    const Icon* icon,
+    IconRotation rotation) {
+    // furi_assert(canvas);
+    // furi_assert(icon);
+
+    x += canvas->offset_x;
+    y += canvas->offset_y;
+    uint8_t* icon_data = NULL;
+    compress_icon_decode(canvas->compress_icon, icon_get_data(icon), &icon_data);
+    canvas_draw_u8g2_bitmap(canvas, x, y, icon_get_width(icon), icon_get_height(icon), icon_data, rotation);
+}
+uint8_t canvas_current_font_height(const Canvas* canvas) {
+   // Adafruit_SSD1306 doesn't have a direct function to get font height,
+    // so we need to use a workaround using the getTextBounds() function.
+
+    // Backup the current font and set a known font (to ensure consistent results).
+    // const GFXfont* original_font = canvas->display->getFont();
+    canvas->display->setTextSize(1); // Set a small text size to get accurate bounds.
+    canvas->display->setFont();      // Use the default font.
+
+    // Get the bounding box of a capital 'M' character (since it usually has the maximum height).
+    int16_t x, y;
+    uint16_t w, h;
+    canvas->display->getTextBounds("M", 0, 0, &x, &y, &w, &h);
+
+    // Restore the original font.
+    canvas->display->setFont(&muMatrix8ptRegular);
+
+    // Add 1 to the height if using a specific font.
+    // if (original_font == &muMatrix8ptRegular) {
+    //     h += 1;
+    // }
+
+    return h;
+}
+void canvas_invert_color(Canvas* canvas) {
+    //  TODO: Implement
+    // canvas->display->draw_color = !canvas->display->draw_color;
+}

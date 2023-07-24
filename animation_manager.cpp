@@ -2,11 +2,13 @@
 #include <stdint.h>
 #include "furi.h"
 #include "furi_hal.h"
+// #include "furi_hal_random.h"
 // #include <portmacro.h>
 // #include <dolphin/dolphin.h>
 // #include <power/power_service/power.h>
+#include <esp_system.h>
 #include "storage.h"
-// #include <assets_icons.h>
+#include "assets_icons.h"
 
 #include "bubble_animation_view.h"
 #include "one_shot_animation_view.h"
@@ -24,6 +26,18 @@
 #define SD_OK_ANIMATION_NAME "L0_SdOk_128x51"
 #define URL_ANIMATION_NAME "L0_Url_128x51"
 #define NEW_MAIL_ANIMATION_NAME "L0_NewMail_128x51"
+
+uint32_t furi_hal_random_get() {
+    uint32_t random_val;
+
+    // ESP32's random number generator is already enabled, no need to enable it explicitly.
+
+    random_val = esp_random();
+
+    // No need to disable the random number generator for ESP32.
+
+    return random_val;
+}
 
 typedef enum {
     AnimationManagerStateIdle,
@@ -198,13 +212,17 @@ bool animation_manager_interact_process(AnimationManager* animation_manager) {
 
 static void animation_manager_start_new_idle(AnimationManager* animation_manager) {
     // furi_assert(animation_manager);
-
     StorageAnimation* new_animation = animation_manager_select_idle_animation(animation_manager);
+    Serial.println("[animation_manager] new_animation");
     animation_manager_replace_current_animation(animation_manager, new_animation);
+    Serial.println("[animation_manager] animation_manager_replace_current_animation");
     const BubbleAnimation* bubble_animation =
         animation_storage_get_bubble_animation(animation_manager->current_animation);
+    Serial.println("[animation_manager] bubble_animation");
     animation_manager->state = AnimationManagerStateIdle;
+    Serial.println("[animation_manager] AnimationManagerStateIdle");
     furi_timer_start(animation_manager->idle_animation_timer, bubble_animation->duration * 1000);
+    Serial.println("[animation_manager] furi_timer_start");
 }
 
 static bool animation_manager_check_blocking(AnimationManager* animation_manager) {
@@ -265,15 +283,21 @@ static void animation_manager_replace_current_animation(
     StorageAnimation* storage_animation) {
     // furi_assert(storage_animation);
     StorageAnimation* previous_animation = animation_manager->current_animation;
+    Serial.println("[animation_manager] previous_animation");
 
     const BubbleAnimation* animation = animation_storage_get_bubble_animation(storage_animation);
+    Serial.println("[animation_manager] animation");
     bubble_animation_view_set_animation(animation_manager->animation_view, animation);
+    Serial.println("[animation_manager] bubble_animation_view_set_animation");
     const char* new_name = animation_storage_get_meta(storage_animation)->name;
+    Serial.println("[animation_manager] new_name");
     // FURI_LOG_I(TAG, "Select \'%s\' animation", new_name);
     animation_manager->current_animation = storage_animation;
+    Serial.println("[animation_manager] current_animation");
 
     if(previous_animation) {
         animation_storage_free_storage_animation(&previous_animation);
+        Serial.println("[animation_manager] animation_storage_free_storage_animation");
     }
 }
 
@@ -397,7 +421,7 @@ static StorageAnimation*
     //     }
     // }
 
-    uint32_t lucky_number = 2 % whole_weight;
+    uint32_t lucky_number = furi_hal_random_get() % whole_weight;
     uint32_t weight = 0;
 
     StorageAnimation* selected = NULL;

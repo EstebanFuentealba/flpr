@@ -126,15 +126,19 @@ uint8_t view_port_get_height(const ViewPort* view_port) {
 
 void view_port_enabled_set(ViewPort* view_port, bool enabled) {
     //furi_assert(view_port);
-    if (view_port->is_enabled != enabled) {
+    if(view_port->is_enabled != enabled) {
         view_port->is_enabled = enabled;
-        if (view_port->gui == true) {
-            Serial.print("[view_port] try gui_update enabled: ");
-            Serial.println(String(enabled));
-            gui_update(view_port->gui);
-            Serial.println("[view_port] gui_update");
-        }
+        if(view_port->gui) gui_update(view_port->gui);
     }
+    // if (view_port->is_enabled != enabled) {
+    //     view_port->is_enabled = enabled;
+    //     if (view_port->gui) {
+    //         Serial.print("[view_port] try gui_update enabled: ");
+    //         Serial.println(String(enabled));
+    //         gui_update(view_port->gui);
+    //         Serial.println("[view_port] gui_update");
+    //     }
+    // }
 }
 
 bool view_port_is_enabled(const ViewPort* view_port) {

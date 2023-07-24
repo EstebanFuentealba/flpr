@@ -316,6 +316,16 @@ void storage_get_next_filename(
     FuriString* nextfilename,
     uint8_t max_len);
 
+/**
+ * @brief Parse aliases in path and replace them with real path
+ * Also will create special folders if they are not exist
+ * 
+ * @param storage 
+ * @param path 
+ * @return bool 
+ */
+void storage_common_resolve_path_and_ensure_app_directory(Storage* storage, FuriString* path);
+
 #ifdef __cplusplus
 }
 #endif

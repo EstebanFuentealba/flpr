@@ -35,7 +35,9 @@ static const char* cstr_path_without_vfs_prefix(FuriString* path) {
     const char* path_cstr = furi_string_get_cstr(path);
     return path_cstr + MIN(STORAGE_PATH_PREFIX_LEN, strlen(path_cstr));
 }
-
+FuriPubSub* storage_get_pubsub(Storage* storage) {
+    return storage->pubsub;
+}
 FS_Error storage_common_stat(Storage* storage, const char* path, FileInfo* fileinfo) {
     if (!storage || !fileinfo) {
         return FSE_INVALID_PARAMETER;
@@ -767,11 +769,22 @@ bool storage_file_copy_to_file(FZFile* source, FZFile* destination, uint32_t siz
     return true;
 }
 
+static void storage_file_close_callback(const void* message, void* context) {
+    const StorageEvent* storage_event = (StorageEvent*)message;
+
+    if(storage_event->type == StorageEventTypeFileClose ||
+       storage_event->type == StorageEventTypeDirClose) {
+        // furi_assert(context);
+        // FuriEventFlag* event = context;
+        // furi_event_flag_set(event, StorageEventFlagFileClose);
+    }
+}
+
 bool storage_dir_open(FZFile* file, const char* path) {
  
     bool result;
     // FuriEventFlag* event = furi_event_flag_alloc();
-    // FuriPubSubSubscription* subscription = furi_pubsub_subscribe(storage_get_pubsub(file->storage), storage_file_close_callback, event);
+    FuriPubSubSubscription* subscription = furi_pubsub_subscribe(storage_get_pubsub((Storage*)file->storage), storage_file_close_callback, NULL);
 
     do {
         result = storage_dir_open_internal(file, path);
@@ -784,7 +797,7 @@ bool storage_dir_open(FZFile* file, const char* path) {
         }
     } while(true);
 
-    // furi_pubsub_unsubscribe(storage_get_pubsub(file->storage), subscription);
+    furi_pubsub_unsubscribe(storage_get_pubsub((Storage*)file->storage), subscription);
     // furi_event_flag_free(event);
 
 

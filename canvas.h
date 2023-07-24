@@ -9,7 +9,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <stdint.h>
-#include "icon_i.h"
+#include "icon_animation.h"
+#include "icon.h"
 
 
 
@@ -262,11 +263,11 @@ void canvas_draw_icon_ex(
  * @param      y               y coordinate
  * @param      icon_animation  IconAnimation instance
  */
-// void canvas_draw_icon_animation(
-//     Canvas* canvas,
-//     uint8_t x,
-//     uint8_t y,
-//     IconAnimation* icon_animation);
+void canvas_draw_icon_animation(
+    Canvas* canvas,
+    uint8_t x,
+    uint8_t y,
+    IconAnimation* icon_animation);
 
 /** Draw icon at position defined by x,y.
  *

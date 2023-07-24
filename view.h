@@ -7,7 +7,8 @@
 
 #include "input.h"
 
-#include "icon_i.h"
+#include "icon_animation.h"
+// #include "icon_i.h"
 #include "canvas.h"
 
 #include <stddef.h>
@@ -106,7 +107,7 @@ void view_free(View* view);
  * @param      view            View instance
  * @param      icon_animation  IconAnimation instance
  */
-void view_tie_icon_animation(View* view, Icon* icon_animation);
+void view_tie_icon_animation(View* view, IconAnimation* icon_animation);
 
 /** Set View Draw callback
  *

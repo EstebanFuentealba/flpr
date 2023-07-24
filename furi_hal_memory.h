@@ -3,7 +3,7 @@
  * Memory HAL API
  */
 
-// #pragma once
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>

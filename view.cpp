@@ -13,10 +13,17 @@ void view_free(View* view) {
     view_free_model(view);
     // free(view);
 }
-
-void view_tie_icon_animation(View* view, Icon* icon_animation) {
+void view_icon_animation_callback(IconAnimation* instance, void* context) {
+    // UNUSED(instance);
+    // furi_assert(context);
+    View* view = (View*)context;
+    if(view->update_callback) {
+        view->update_callback(view, view->update_callback_context);
+    }
+}
+void view_tie_icon_animation(View* view, IconAnimation* icon_animation) {
     //furi_assert(view);
-    // icon_animation_set_update_callback(icon_animation, view_icon_animation_callback, view);
+    icon_animation_set_update_callback(icon_animation, view_icon_animation_callback, view);
 }
 
 void view_set_draw_callback(View* view, ViewDrawCallback callback) {
@@ -133,9 +140,9 @@ void view_commit_model(View* view, bool update) {
     //furi_assert(view);
     view_unlock_model(view);
     //  TODO: Implement view update_callback
-    // if(update && view->update_callback) {
-    //     view->update_callback(view, view->update_callback_context);
-    // }
+    if(update && view->update_callback) {
+        view->update_callback(view, view->update_callback_context);
+    }
 }
 
 void view_icon_animation_callback(Icon* instance, void* context) {

@@ -2,51 +2,51 @@
 #include "icon_i.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-// #include <assets_icons.h>
+#include "assets_icons.h"
 
 #define TAG "GuiSrv"
 
-// 'Background_128x11', 128x11px
-const unsigned char Background_128x11Background_128x11 [] PROGMEM = {
-	0x7f, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0xff, 0xff, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 
-	0x80, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 
-	0xbe, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0xff, 0xed, 0xaa, 0x8c, 0x00, 0x00, 0x00, 0x00, 
-	0x81, 0x3f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xf1, 0x00, 0x00, 0x00, 0x47, 0xff, 0xff, 0xff, 0xfe, 
-	0xbc, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x6d, 0x57, 0xff, 0x20, 0x00, 0x00, 0x00, 0x01, 
-	0x82, 0x7f, 0xff, 0xff, 0x55, 0x7f, 0xff, 0xfc, 0x80, 0x00, 0x00, 0x9f, 0xff, 0xff, 0xff, 0xd5, 
-	0xf9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x1f, 0xff, 0xfe, 0x40, 0x00, 0x00, 0x00, 0x01, 
-	0x7c, 0xff, 0xff, 0xff, 0xff, 0xaa, 0xbf, 0xfe, 0x3f, 0xff, 0xff, 0x36, 0xff, 0xff, 0xff, 0xad, 
-	0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x01, 0x80, 0x00, 0x00, 0x00, 0x01, 
-	0x03, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 
-	0x01, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x00, 0x00, 0x7f, 0xff, 0xff, 0xff, 0xfe
-};
-const uint8_t* const frame_Background_128x11Background_128x11[] = { Background_128x11Background_128x11 };
+// // 'Background_128x11', 128x11px
+// const unsigned char Background_128x11Background_128x11 [] PROGMEM = {
+// 	0x7f, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0xff, 0xff, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 
+// 	0x80, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 
+// 	0xbe, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0xff, 0xed, 0xaa, 0x8c, 0x00, 0x00, 0x00, 0x00, 
+// 	0x81, 0x3f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xf1, 0x00, 0x00, 0x00, 0x47, 0xff, 0xff, 0xff, 0xfe, 
+// 	0xbc, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x6d, 0x57, 0xff, 0x20, 0x00, 0x00, 0x00, 0x01, 
+// 	0x82, 0x7f, 0xff, 0xff, 0x55, 0x7f, 0xff, 0xfc, 0x80, 0x00, 0x00, 0x9f, 0xff, 0xff, 0xff, 0xd5, 
+// 	0xf9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x1f, 0xff, 0xfe, 0x40, 0x00, 0x00, 0x00, 0x01, 
+// 	0x7c, 0xff, 0xff, 0xff, 0xff, 0xaa, 0xbf, 0xfe, 0x3f, 0xff, 0xff, 0x36, 0xff, 0xff, 0xff, 0xad, 
+// 	0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x01, 0x80, 0x00, 0x00, 0x00, 0x01, 
+// 	0x03, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 
+// 	0x01, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x00, 0x00, 0x7f, 0xff, 0xff, 0xff, 0xfe
+// };
+// const uint8_t* const frame_Background_128x11Background_128x11[] = { Background_128x11Background_128x11 };
 
 
-// 'Hidden_window_9x8', 9x8px
-const unsigned char Hidden_window_bitmap_Hidden_window_9x8 [] PROGMEM = {
-	0x7f, 0x80, 0x7e, 0x80, 0x7f, 0x80, 0x40, 0x80, 0xfe, 0x80, 0x82, 0x80, 0x83, 0x80, 0xfe, 0x00
-};
-const uint8_t* const frame_Hidden_window_bitmap_Hidden_window_9x8[] = { Hidden_window_bitmap_Hidden_window_9x8 };
+// // 'Hidden_window_9x8', 9x8px
+// const unsigned char Hidden_window_bitmap_Hidden_window_9x8 [] PROGMEM = {
+// 	0x7f, 0x80, 0x7e, 0x80, 0x7f, 0x80, 0x40, 0x80, 0xfe, 0x80, 0x82, 0x80, 0x83, 0x80, 0xfe, 0x00
+// };
+// const uint8_t* const frame_Hidden_window_bitmap_Hidden_window_9x8[] = { Hidden_window_bitmap_Hidden_window_9x8 };
 
 
 
 
 
-Icon I_Background_128x11 = {
-    .width = 128,
-    .height = 11,
-    .frame_count = 1,
-    .frame_rate = 1,
-    .frames = frame_Background_128x11Background_128x11
-};
-Icon I_Hidden_window_9x8 = {
-    .width = 8,
-    .height = 8,
-    .frame_count = 1,
-    .frame_rate = 1,
-    .frames = frame_Hidden_window_bitmap_Hidden_window_9x8
-};
+// Icon I_Background_128x11 = {
+//     .width = 128,
+//     .height = 11,
+//     .frame_count = 1,
+//     .frame_rate = 1,
+//     .frames = frame_Background_128x11Background_128x11
+// };
+// Icon I_Hidden_window_9x8 = {
+//     .width = 8,
+//     .height = 8,
+//     .frame_count = 1,
+//     .frame_rate = 1,
+//     .frames = frame_Hidden_window_bitmap_Hidden_window_9x8
+// };
 
 
 
@@ -73,7 +73,7 @@ void gui_input_events_callback(const void* value, void* ctx) {
     // furi_assert(value);
     // furi_assert(ctx);
 
-    Gui* gui = ctx;
+    Gui* gui = (Gui*)ctx;
 
     // furi_message_queue_put(gui->input_queue, value, FuriWaitForever);
     // furi_thread_flags_set(gui->thread_id, GUI_THREAD_FLAG_INPUT);
@@ -296,7 +296,7 @@ static void gui_redraw(Gui* gui) {
                 gui_redraw_status_bar(gui, false);
             }
         }
-
+        // Serial.println("canvas_commit");
         canvas_commit(gui->canvas);
         for
             M_EACH(p, gui->canvas_callback_pair, CanvasCallbackPairArray_t) {
@@ -458,7 +458,7 @@ void gui_view_port_send_to_front(Gui* gui, ViewPort* view_port) {
             if(*ViewPortArray_ref(it) == view_port) {
                 ViewPortArray_remove(gui->layers[i], it);
                 // furi_assert(layer == GuiLayerMAX);
-                layer = i;
+                layer = (GuiLayer)i;
             } else {
                 ViewPortArray_next(it);
             }
@@ -487,7 +487,7 @@ void gui_view_port_send_to_back(Gui* gui, ViewPort* view_port) {
             if(*ViewPortArray_ref(it) == view_port) {
                 ViewPortArray_remove(gui->layers[i], it);
                 // furi_assert(layer == GuiLayerMAX);
-                layer = i;
+                layer = (GuiLayer)i;
             } else {
                 ViewPortArray_next(it);
             }
@@ -569,7 +569,7 @@ void gui_direct_draw_release(Gui* gui) {
 }
 
 Gui* gui_alloc() {
-    Gui* gui = malloc(sizeof(Gui));
+    Gui* gui = (Gui*)malloc(sizeof(Gui));
     // // Thread ID
     // gui->thread_id = furi_thread_get_current_id();
     // // Allocate mutex
@@ -585,7 +585,7 @@ Gui* gui_alloc() {
 
     // Input
     // gui->input_queue = furi_message_queue_alloc(8, sizeof(InputEvent));
-    gui->input_events = furi_record_open(RECORD_INPUT_EVENTS);
+    gui->input_events = (FuriPubSub*)furi_record_open(RECORD_INPUT_EVENTS);
 
     // furi_check(gui->input_events);
     furi_pubsub_subscribe(gui->input_events, gui_input_events_callback, gui);
@@ -601,31 +601,32 @@ Gui* gui_setup() {
 void gui_loop(Gui* gui) {
     gui_redraw(gui);
 }
-// int32_t gui_srv(void* p) {
-//     UNUSED(p);
-//     Gui* gui = gui_alloc();
+/*
+int32_t gui_srv(void* p) {
+    // UNUSED(p);
+    Gui* gui = gui_alloc();
 
-//     furi_record_create(RECORD_GUI, gui);
+    furi_record_create(RECORD_GUI, gui);
 
-//     while(1) {
-//         uint32_t flags =
-//             furi_thread_flags_wait(GUI_THREAD_FLAG_ALL, FuriFlagWaitAny, FuriWaitForever);
-//         // Process and dispatch input
-//         if(flags & GUI_THREAD_FLAG_INPUT) {
-//             // Process till queue become empty
-//             InputEvent input_event;
-//             while(furi_message_queue_get(gui->input_queue, &input_event, 0) == FuriStatusOk) {
-//                 gui_input(gui, &input_event);
-//             }
-//         }
-//         // Process and dispatch draw call
-//         if(flags & GUI_THREAD_FLAG_DRAW) {
-//             // Clear flags that arrived on input step
-//             furi_thread_flags_clear(GUI_THREAD_FLAG_DRAW);
-//             gui_redraw(gui);
-//         }
-//     }
+    while(1) {
+        uint32_t flags =
+            furi_thread_flags_wait(GUI_THREAD_FLAG_ALL, FuriFlagWaitAny, FuriWaitForever);
+        // Process and dispatch input
+        if(flags & GUI_THREAD_FLAG_INPUT) {
+            // Process till queue become empty
+            InputEvent input_event;
+            // while(furi_message_queue_get(gui->input_queue, &input_event, 0) == FuriStatusOk) {
+            //     gui_input(gui, &input_event);
+            // }
+        }
+        // Process and dispatch draw call
+        if(flags & GUI_THREAD_FLAG_DRAW) {
+            // Clear flags that arrived on input step
+            furi_thread_flags_clear(GUI_THREAD_FLAG_DRAW);
+            gui_redraw(gui);
+        }
+    }
 
-//     return 0;
-// }
-
+    return 0;
+}
+*/

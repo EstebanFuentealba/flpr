@@ -1,13 +1,15 @@
 #pragma once
 
-#ifndef FURI_UTILS_H
-#define FURI_UTILS_H
-
+#include "core_defines.h"
 #include <stdbool.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// #include <cmsis_compiler.h>
 
 #ifndef FURI_WARN_UNUSED
 #define FURI_WARN_UNUSED __attribute__((warn_unused_result))
@@ -18,11 +20,11 @@ extern "C" {
 #endif
 
 #ifndef FURI_IS_IRQ_MASKED
-#define FURI_IS_IRQ_MASKED() (false)
+#define FURI_IS_IRQ_MASKED() (__get_PRIMASK() != 0U)
 #endif
 
 #ifndef FURI_IS_IRQ_MODE
-#define FURI_IS_IRQ_MODE() (FURI_IS_IRQ_MASKED())
+#define FURI_IS_IRQ_MODE() (__get_IPSR() != 0U)
 #endif
 
 #ifndef FURI_IS_ISR
@@ -50,5 +52,3 @@ void __furi_critical_exit(__FuriCriticalInfo info);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // FURI_UTILS_H

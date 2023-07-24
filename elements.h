@@ -103,14 +103,14 @@ void elements_bubble_str(
  */
 void elements_string_fit_width(Canvas* canvas, FuriString* string, uint8_t width);
 
-// void elements_scrollable_text_line(
-//     Canvas* canvas,
-//     uint8_t x,
-//     uint8_t y,
-//     uint8_t width,
-//     FuriString* string,
-//     size_t scroll,
-//     bool ellipsis);
+void elements_scrollable_text_line(
+    Canvas* canvas,
+    uint8_t x,
+    uint8_t y,
+    uint8_t width,
+    FuriString* string,
+    size_t scroll,
+    bool ellipsis);
 
 void elements_text_box(
     Canvas* canvas,

@@ -1,14 +1,14 @@
 #pragma once
 
 #include "desktop.h"
-// #include "animation_manager.h"
-#include "applications/desktop/views/desktop_view_pin_timeout.h"
-#include "applications/desktop/views/desktop_view_pin_input.h"
-#include "applications/desktop/views/desktop_view_locked.h"
-#include "applications/desktop/views/desktop_view_main.h"
-#include "applications/desktop/views/desktop_view_lock_menu.h"
-#include "applications/desktop/views/desktop_view_debug.h"
-#include "applications/desktop/views/desktop_view_slideshow.h"
+#include "animation_manager.h"
+#include "desktop_view_pin_timeout.h"
+#include "desktop_view_pin_input.h"
+#include "desktop_view_locked.h"
+#include "desktop_view_main.h"
+#include "desktop_view_lock_menu.h"
+#include "desktop_view_debug.h"
+#include "desktop_view_slideshow.h"
 #include "desktop_settings.h"
 
 #include "furi.h"
@@ -61,7 +61,7 @@ struct Desktop {
     ViewPort* dummy_mode_icon_viewport;
     ViewPort* stealth_mode_icon_viewport;
 
-    // AnimationManager* animation_manager;
+    AnimationManager* animation_manager;
 
     Loader* loader;
     // NotificationApp* notification;
@@ -83,3 +83,6 @@ void desktop_lock(Desktop* desktop);
 void desktop_unlock(Desktop* desktop);
 void desktop_set_dummy_mode_state(Desktop* desktop, bool enabled);
 void desktop_set_stealth_mode_state(Desktop* desktop, bool enabled);
+
+void desktop_setup();
+void desktop_loop();

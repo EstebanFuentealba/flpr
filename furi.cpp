@@ -22,7 +22,9 @@ void furi_init() {
 void furi_run() {
     /* Start the FreeRTOS scheduler */
     // #ifdef RUN_THREAD
+    // if(xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED) {
     // vTaskStartScheduler();
+    // }
     // #endif
     
 }

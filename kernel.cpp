@@ -4,8 +4,8 @@
 #include "common_defines.h"
 
 #include <Arduino.h>
-// #include <FreeRTOS.h>
-// #include <task.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 
 bool furi_kernel_is_irq_or_masked() {
     bool irq = false;

@@ -3,7 +3,7 @@
 #include <cstddef>
 
 // Tamaño del pool de memoria en bytes
-#define FURI_HAL_MEMORY_POOL_SIZE 4096
+#define FURI_HAL_MEMORY_POOL_SIZE 512
 
 // Pool de memoria
 static uint8_t furi_hal_memory_pool[FURI_HAL_MEMORY_POOL_SIZE];

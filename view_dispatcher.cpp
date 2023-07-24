@@ -76,9 +76,10 @@ void view_dispatcher_set_tick_event_callback(
 void view_dispatcher_run(ViewDispatcher* view_dispatcher) {
     // furi_assert(view_dispatcher);
     // furi_assert(view_dispatcher->queue);
-
+    Serial.println("[view_dispatcher] view_dispatcher_run");
     uint32_t tick_period = view_dispatcher->tick_period == 0 ? FuriWaitForever :
                                                                view_dispatcher->tick_period;
+                                                        Serial.println(tick_period);
     //  TODO: Implement loop without furi_message_queue_get
 
     // ViewDispatcherMessage message;

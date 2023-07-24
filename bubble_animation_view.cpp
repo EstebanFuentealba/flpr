@@ -93,13 +93,21 @@ static void bubble_animation_draw_callback(Canvas* canvas, void* model_) {
 static const FrameBubble*
     bubble_animation_pick_bubble(BubbleAnimationViewModel* model, bool active) {
     const FrameBubble* bubble = NULL;
-
+    Serial.println("[bubble_animation] active");
+    Serial.println(active);
+    Serial.println("[bubble_animation] active_bubbles");
+    Serial.println(model->active_bubbles);
+    Serial.println("[bubble_animation] passive_bubbles");
+    Serial.println(model->passive_bubbles);
     if((model->active_bubbles == 0) && (model->passive_bubbles == 0)) {
         return NULL;
     }
 
     uint8_t index =
-        1 % (active ? model->active_bubbles : model->passive_bubbles);
+        2 % (active ? model->active_bubbles : model->passive_bubbles);
+
+    Serial.println("[bubble_animation] index");
+    Serial.println(index);
     const BubbleAnimation* animation = model->current;
 
     for(int i = 0; i < animation->frame_bubble_sequences_count; ++i) {
@@ -111,6 +119,7 @@ static const FrameBubble*
             --index;
         }
     }
+    Serial.println("[bubble_animation] bubble_animation_pick_bubble frame_bubble_sequences_count");
 
     return bubble;
 }
@@ -356,10 +365,12 @@ void bubble_animation_view_set_animation(
     // furi_assert(new_animation);
 
     BubbleAnimationViewModel* model = (BubbleAnimationViewModel*)view_get_model(view->view);
+    Serial.println("[bubble_animation] model");
     // furi_assert(model);
     model->current = new_animation;
 
     model->active_ended_at = xTaskGetTickCount() - (model->current->active_cooldown * 1000);
+    Serial.println("[bubble_animation] active_ended_at");
     model->active_bubbles = 0;
     model->passive_bubbles = 0;
     for(int i = 0; i < new_animation->frame_bubble_sequences_count; ++i) {
@@ -369,14 +380,18 @@ void bubble_animation_view_set_animation(
             ++model->active_bubbles;
         }
     }
+    Serial.println("[bubble_animation] frame_bubble_sequences");
 
     /* select bubble sequence */
-    model->current_bubble = bubble_animation_pick_bubble(model, false);
+    model->current_bubble = bubble_animation_pick_bubble(model, true);
+    Serial.println("[bubble_animation] bubble_animation_pick_bubble");
     model->current_frame = 0;
     model->active_cycle = 0;
     view_commit_model(view->view, true);
+     Serial.println("[bubble_animation] view_commit_model");
 
     furi_timer_start(view->timer, 1000 / new_animation->icon_animation.frame_rate);
+     Serial.println("[bubble_animation] furi_timer_start");
 }
 
 void bubble_animation_freeze(BubbleAnimationView* view) {
