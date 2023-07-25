@@ -1,54 +1,7 @@
 #include "gui_i.h"
-#include "icon_i.h"
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 #include "assets_icons.h"
 
 #define TAG "GuiSrv"
-
-// // 'Background_128x11', 128x11px
-// const unsigned char Background_128x11Background_128x11 [] PROGMEM = {
-// 	0x7f, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07, 0xff, 0xff, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 
-// 	0x80, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x00, 0x00, 0x00, 0x18, 0x00, 0x00, 0x00, 0x00, 
-// 	0xbe, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0xff, 0xed, 0xaa, 0x8c, 0x00, 0x00, 0x00, 0x00, 
-// 	0x81, 0x3f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xf1, 0x00, 0x00, 0x00, 0x47, 0xff, 0xff, 0xff, 0xfe, 
-// 	0xbc, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x6d, 0x57, 0xff, 0x20, 0x00, 0x00, 0x00, 0x01, 
-// 	0x82, 0x7f, 0xff, 0xff, 0x55, 0x7f, 0xff, 0xfc, 0x80, 0x00, 0x00, 0x9f, 0xff, 0xff, 0xff, 0xd5, 
-// 	0xf9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x1f, 0xff, 0xfe, 0x40, 0x00, 0x00, 0x00, 0x01, 
-// 	0x7c, 0xff, 0xff, 0xff, 0xff, 0xaa, 0xbf, 0xfe, 0x3f, 0xff, 0xff, 0x36, 0xff, 0xff, 0xff, 0xad, 
-// 	0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x01, 0x80, 0x00, 0x00, 0x00, 0x01, 
-// 	0x03, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 
-// 	0x01, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x80, 0x00, 0x00, 0x7f, 0xff, 0xff, 0xff, 0xfe
-// };
-// const uint8_t* const frame_Background_128x11Background_128x11[] = { Background_128x11Background_128x11 };
-
-
-// // 'Hidden_window_9x8', 9x8px
-// const unsigned char Hidden_window_bitmap_Hidden_window_9x8 [] PROGMEM = {
-// 	0x7f, 0x80, 0x7e, 0x80, 0x7f, 0x80, 0x40, 0x80, 0xfe, 0x80, 0x82, 0x80, 0x83, 0x80, 0xfe, 0x00
-// };
-// const uint8_t* const frame_Hidden_window_bitmap_Hidden_window_9x8[] = { Hidden_window_bitmap_Hidden_window_9x8 };
-
-
-
-
-
-// Icon I_Background_128x11 = {
-//     .width = 128,
-//     .height = 11,
-//     .frame_count = 1,
-//     .frame_rate = 1,
-//     .frames = frame_Background_128x11Background_128x11
-// };
-// Icon I_Hidden_window_9x8 = {
-//     .width = 8,
-//     .height = 8,
-//     .frame_count = 1,
-//     .frame_rate = 1,
-//     .frames = frame_Hidden_window_bitmap_Hidden_window_9x8
-// };
-
-
 
 ViewPort* gui_view_port_find_enabled(ViewPortArray_t array) {
     // Iterating backward
@@ -66,7 +19,7 @@ ViewPort* gui_view_port_find_enabled(ViewPortArray_t array) {
 
 void gui_update(Gui* gui) {
     // furi_assert(gui);
-    // if(!gui->direct_draw) furi_thread_flags_set(gui->thread_id, GUI_THREAD_FLAG_DRAW);
+    if(!gui->direct_draw) furi_thread_flags_set(gui->thread_id, GUI_THREAD_FLAG_DRAW);
 }
 
 void gui_input_events_callback(const void* value, void* ctx) {
@@ -74,11 +27,9 @@ void gui_input_events_callback(const void* value, void* ctx) {
     // furi_assert(ctx);
 
     Gui* gui = (Gui*)ctx;
-   
+
     furi_message_queue_put(gui->input_queue, value, FuriWaitForever);
-     Serial.println("[gui] furi_message_queue_put");
     furi_thread_flags_set(gui->thread_id, GUI_THREAD_FLAG_INPUT);
-     Serial.println("[gui] furi_thread_flags_set");
 }
 
 // Only Fullscreen supports vertical display for now
@@ -112,15 +63,17 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
     /* for support black theme - paint white area and
      * draw icon with transparent white color
      */
+    // canvas_set_color(gui->canvas, ColorWhite);
+    // canvas_draw_box(gui->canvas, 1, 1, 9, 7);
+    // canvas_draw_box(gui->canvas, 7, 3, 58, 6);
+    // canvas_draw_box(gui->canvas, 61, 1, 32, 7);
+    // canvas_draw_box(gui->canvas, 89, 3, 38, 6);
+    // canvas_set_color(gui->canvas, ColorBlack);
     canvas_set_color(gui->canvas, ColorWhite);
-    canvas_draw_box(gui->canvas, 1, 1, 9, 7);
-    canvas_draw_box(gui->canvas, 7, 3, 58, 6);
-    canvas_draw_box(gui->canvas, 61, 1, 32, 7);
-    canvas_draw_box(gui->canvas, 89, 3, 38, 6);
-    canvas_set_color(gui->canvas, ColorBlack);
     canvas_set_bitmap_mode(gui->canvas, 1);
     canvas_draw_icon(gui->canvas, 0, 0, &I_Background_128x11);
     canvas_set_bitmap_mode(gui->canvas, 0);
+    canvas_set_color(gui->canvas, ColorBlack);
 
     // Right side
     uint8_t x = GUI_DISPLAY_WIDTH - 1;
@@ -134,16 +87,10 @@ static void gui_redraw_status_bar(Gui* gui, bool need_attention) {
             right_used += (width + 2);
             x -= (width + 2);
             // Prepare work area background
-            canvas_frame_set(
-                gui->canvas,
-                x - 1,
-                GUI_STATUS_BAR_Y + 1,
-                width + 2,
-                GUI_STATUS_BAR_WORKAREA_HEIGHT + 2);
-            canvas_set_color(gui->canvas, ColorWhite);
-            canvas_draw_box(
-                gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas));
+            canvas_frame_set(gui->canvas, x - 1, GUI_STATUS_BAR_Y + 1, width + 2, GUI_STATUS_BAR_WORKAREA_HEIGHT + 2);
             canvas_set_color(gui->canvas, ColorBlack);
+            canvas_draw_box(gui->canvas, 0, 0, canvas_width(gui->canvas), canvas_height(gui->canvas));
+            canvas_set_color(gui->canvas, ColorWhite);
             // ViewPort draw
             canvas_frame_set(
                 gui->canvas, x, GUI_STATUS_BAR_Y + 2, width, GUI_STATUS_BAR_WORKAREA_HEIGHT);
@@ -274,15 +221,9 @@ static void gui_redraw(Gui* gui) {
     gui_lock(gui);
 
     do {
-        // Serial.print("direct_draw: ");
-        // Serial.println(gui->direct_draw);
-        // Serial.print("lockdown: ");
-        // Serial.println(gui->lockdown);
-
         if(gui->direct_draw) break;
 
         canvas_reset(gui->canvas);
-        canvas_set_color(gui->canvas, WHITE);
 
         if(gui->lockdown) {
             gui_redraw_desktop(gui);
@@ -298,7 +239,7 @@ static void gui_redraw(Gui* gui) {
                 gui_redraw_status_bar(gui, false);
             }
         }
-        // Serial.println("canvas_commit");
+
         canvas_commit(gui->canvas);
         for
             M_EACH(p, gui->canvas_callback_pair, CanvasCallbackPairArray_t) {
@@ -324,12 +265,11 @@ static void gui_input(Gui* gui, InputEvent* input_event) {
     } else if(input_event->type == InputTypePress) {
         gui->ongoing_input |= key_bit;
     } else if(!(gui->ongoing_input & key_bit)) {
-        // FURI_LOG_D(
-        //     TAG,
-        //     "non-complementary input, discarding key: %s type: %s, sequence: %p",
-        //     input_get_key_name(input_event->key),
-        //     input_get_type_name(input_event->type),
-        //     (void*)input_event->sequence);
+        Serial.printf(
+            "non-complementary input, discarding key: %s type: %s, sequence: %p\n",
+            input_get_key_name(input_event->key),
+            input_get_type_name(input_event->type),
+            (void*)input_event->sequence);
         return;
     }
 
@@ -357,24 +297,22 @@ static void gui_input(Gui* gui, InputEvent* input_event) {
         if(view_port && view_port == gui->ongoing_input_view_port) {
             view_port_input(view_port, input_event);
         } else if(gui->ongoing_input_view_port && input_event->type == InputTypeRelease) {
-            // FURI_LOG_D(
-            //     TAG,
-            //     "ViewPort changed while key press %p -> %p. Sending key: %s, type: %s, sequence: %p to previous view port",
-            //     gui->ongoing_input_view_port,
-            //     view_port,
-            //     input_get_key_name(input_event->key),
-            //     input_get_type_name(input_event->type),
-            //     (void*)input_event->sequence);
+            Serial.printf(
+                "ViewPort changed while key press %p -> %p. Sending key: %s, type: %s, sequence: %p to previous view port\n",
+                gui->ongoing_input_view_port,
+                view_port,
+                input_get_key_name(input_event->key),
+                input_get_type_name(input_event->type),
+                (void*)input_event->sequence);
             view_port_input(gui->ongoing_input_view_port, input_event);
         } else {
-            // FURI_LOG_D(
-            //     TAG,
-            //     "ViewPort changed while key press %p -> %p. Discarding key: %s, type: %s, sequence: %p",
-            //     gui->ongoing_input_view_port,
-            //     view_port,
-            //     input_get_key_name(input_event->key),
-            //     input_get_type_name(input_event->type),
-            //     (void*)input_event->sequence);
+            Serial.printf(
+                "ViewPort changed while key press %p -> %p. Discarding key: %s, type: %s, sequence: %p\n",
+                gui->ongoing_input_view_port,
+                view_port,
+                input_get_key_name(input_event->key),
+                input_get_type_name(input_event->type),
+                (void*)input_event->sequence);
         }
     } while(false);
 
@@ -383,17 +321,13 @@ static void gui_input(Gui* gui, InputEvent* input_event) {
 
 void gui_lock(Gui* gui) {
     // furi_assert(gui);
-    if(furi_mutex_acquire(gui->mutex, FuriWaitForever) == FuriStatusOk) {
-
-    }
+    if(furi_mutex_acquire(gui->mutex, FuriWaitForever) == FuriStatusOk) {}
     // furi_check(furi_mutex_acquire(gui->mutex, FuriWaitForever) == FuriStatusOk);
 }
 
 void gui_unlock(Gui* gui) {
     // furi_assert(gui);
-    if(furi_mutex_release(gui->mutex) == FuriStatusOk) {
-
-    }
+    if(furi_mutex_release(gui->mutex) == FuriStatusOk) {}
     // furi_check(furi_mutex_release(gui->mutex) == FuriStatusOk);
 }
 
@@ -577,13 +511,12 @@ void gui_direct_draw_release(Gui* gui) {
 }
 
 Gui* gui_alloc() {
-    Gui* gui = (Gui*)malloc(sizeof(Gui));
-    // // Thread ID
+    Gui* gui = ( Gui*)malloc(sizeof(Gui));
+    // Thread ID
     gui->thread_id = furi_thread_get_current_id();
-    // // Allocate mutex
+    // Allocate mutex
     gui->mutex = furi_mutex_alloc(FuriMutexTypeNormal);
     // furi_check(gui->mutex);
-    Serial.println("[gui] ViewPortArray_init");
     // Layers
     for(size_t i = 0; i < GuiLayerMAX; i++) {
         ViewPortArray_init(gui->layers[i]);
@@ -591,48 +524,34 @@ Gui* gui_alloc() {
     // Drawing canvas
     gui->canvas = canvas_init();
     CanvasCallbackPairArray_init(gui->canvas_callback_pair);
-    Serial.println("[gui] CanvasCallbackPairArray_init");
+
     // Input
     gui->input_queue = furi_message_queue_alloc(8, sizeof(InputEvent));
-    Serial.println("[gui] input_queue");
     gui->input_events = (FuriPubSub*)furi_record_open(RECORD_INPUT_EVENTS);
-    Serial.println("[gui] input_events");
 
     // furi_check(gui->input_events);
     furi_pubsub_subscribe(gui->input_events, gui_input_events_callback, gui);
-    Serial.println("[gui] furi_pubsub_subscribe");
 
     return gui;
-}
-
-Gui* gui_setup() {
-    Gui* gui = gui_alloc();
-    furi_record_create(RECORD_GUI, gui);
-    return gui;
-}
-void gui_loop(Gui* gui) {
-    gui_redraw(gui);
 }
 
 int32_t gui_srv(void* p) {
-    // UNUSED(p);
+    UNUSED(p);
     Gui* gui = gui_alloc();
-    Serial.println("[gui] gui_alloc");
+
     furi_record_create(RECORD_GUI, gui);
-    furi_thread_flags_set(gui->thread_id, GUI_THREAD_FLAG_DRAW);
-  
+
     while(1) {
-        uint32_t flags = furi_thread_flags_wait(GUI_THREAD_FLAG_ALL, FuriFlagWaitAny, FuriWaitForever);
-    //     Serial.println("flags:");
-    //      Serial.println(flags);
-    //     // Process and dispatch input
-        // if(flags & GUI_THREAD_FLAG_INPUT) {
-        //     // Process till queue become empty
-        //     InputEvent input_event;
-        //     while(furi_message_queue_get(gui->input_queue, &input_event, 0) == FuriStatusOk) {
-        //         gui_input(gui, &input_event);
-        //     }
-        // }
+        uint32_t flags =
+            furi_thread_flags_wait(GUI_THREAD_FLAG_ALL, FuriFlagWaitAny, FuriWaitForever);
+        // Process and dispatch input
+        if(flags & GUI_THREAD_FLAG_INPUT) {
+            // Process till queue become empty
+            InputEvent input_event;
+            while(furi_message_queue_get(gui->input_queue, &input_event, 0) == FuriStatusOk) {
+                gui_input(gui, &input_event);
+            }
+        }
         // Process and dispatch draw call
         if(flags & GUI_THREAD_FLAG_DRAW) {
             // Clear flags that arrived on input step

@@ -1,10 +1,10 @@
 #include "view_dispatcher_i.h"
-#define TAG "ViewDispatcher"
 
 #define TAG "ViewDispatcher"
 
 ViewDispatcher* view_dispatcher_alloc() {
-    ViewDispatcher* view_dispatcher = malloc(sizeof(ViewDispatcher));
+    ViewDispatcher* view_dispatcher = (ViewDispatcher*)malloc(sizeof(ViewDispatcher));
+
     view_dispatcher->view_port = view_port_alloc();
     view_port_draw_callback_set(
         view_dispatcher->view_port, view_dispatcher_draw_callback, view_dispatcher);
@@ -29,9 +29,9 @@ void view_dispatcher_free(ViewDispatcher* view_dispatcher) {
     // Free ViewPort
     view_port_free(view_dispatcher->view_port);
     // Free internal queue
-    // if(view_dispatcher->queue) {
-    //     furi_message_queue_free(view_dispatcher->queue);
-    // }
+    if(view_dispatcher->queue) {
+        furi_message_queue_free(view_dispatcher->queue);
+    }
     // Free dispatcher
     free(view_dispatcher);
 }
@@ -39,7 +39,7 @@ void view_dispatcher_free(ViewDispatcher* view_dispatcher) {
 void view_dispatcher_enable_queue(ViewDispatcher* view_dispatcher) {
     // furi_assert(view_dispatcher);
     // furi_assert(view_dispatcher->queue == NULL);
-    // view_dispatcher->queue = furi_message_queue_alloc(16, sizeof(ViewDispatcherMessage));
+    view_dispatcher->queue = furi_message_queue_alloc(16, sizeof(ViewDispatcherMessage));
 }
 
 void view_dispatcher_set_event_callback_context(ViewDispatcher* view_dispatcher, void* context) {
@@ -76,39 +76,36 @@ void view_dispatcher_set_tick_event_callback(
 void view_dispatcher_run(ViewDispatcher* view_dispatcher) {
     // furi_assert(view_dispatcher);
     // furi_assert(view_dispatcher->queue);
-    Serial.println("[view_dispatcher] view_dispatcher_run");
+
     uint32_t tick_period = view_dispatcher->tick_period == 0 ? FuriWaitForever :
                                                                view_dispatcher->tick_period;
-                                                        Serial.println(tick_period);
-    //  TODO: Implement loop without furi_message_queue_get
+    ViewDispatcherMessage message;
+    while(1) {
+        if(furi_message_queue_get(view_dispatcher->queue, &message, tick_period) != FuriStatusOk) {
+            view_dispatcher_handle_tick_event(view_dispatcher);
+            continue;
+        }
+        if(message.type == ViewDispatcherMessageTypeStop) {
+            break;
+        } else if(message.type == ViewDispatcherMessageTypeInput) {
+            view_dispatcher_handle_input(view_dispatcher, &message.input);
+        } else if(message.type == ViewDispatcherMessageTypeCustomEvent) {
+            view_dispatcher_handle_custom_event(view_dispatcher, message.custom_event);
+        }
+    }
 
-    // ViewDispatcherMessage message;
-    // while(1) {
-    //     if(furi_message_queue_get(view_dispatcher->queue, &message, tick_period) != FuriStatusOk) {
-    //         view_dispatcher_handle_tick_event(view_dispatcher);
-    //         continue;
-    //     }
-    //     if(message.type == ViewDispatcherMessageTypeStop) {
-    //         break;
-    //     } else if(message.type == ViewDispatcherMessageTypeInput) {
-    //         view_dispatcher_handle_input(view_dispatcher, &message.input);
-    //     } else if(message.type == ViewDispatcherMessageTypeCustomEvent) {
-    //         view_dispatcher_handle_custom_event(view_dispatcher, message.custom_event);
-    //     }
-    // }
-
-    // // Wait till all input events delivered
-    // while(view_dispatcher->ongoing_input) {
-    //     furi_message_queue_get(view_dispatcher->queue, &message, FuriWaitForever);
-    //     if(message.type == ViewDispatcherMessageTypeInput) {
-    //         uint8_t key_bit = (1 << message.input.key);
-    //         if(message.input.type == InputTypePress) {
-    //             view_dispatcher->ongoing_input |= key_bit;
-    //         } else if(message.input.type == InputTypeRelease) {
-    //             view_dispatcher->ongoing_input &= ~key_bit;
-    //         }
-    //     }
-    // }
+    // Wait till all input events delivered
+    while(view_dispatcher->ongoing_input) {
+        furi_message_queue_get(view_dispatcher->queue, &message, FuriWaitForever);
+        if(message.type == ViewDispatcherMessageTypeInput) {
+            uint8_t key_bit = (1 << message.input.key);
+            if(message.input.type == InputTypePress) {
+                view_dispatcher->ongoing_input |= key_bit;
+            } else if(message.input.type == InputTypeRelease) {
+                view_dispatcher->ongoing_input &= ~key_bit;
+            }
+        }
+    }
 }
 
 void view_dispatcher_stop(ViewDispatcher* view_dispatcher) {
@@ -116,14 +113,15 @@ void view_dispatcher_stop(ViewDispatcher* view_dispatcher) {
     // furi_assert(view_dispatcher->queue);
     ViewDispatcherMessage message;
     message.type = ViewDispatcherMessageTypeStop;
-    // furi_check(
-    //     furi_message_queue_put(view_dispatcher->queue, &message, FuriWaitForever) == FuriStatusOk);
+    if(furi_message_queue_put(view_dispatcher->queue, &message, FuriWaitForever) == FuriStatusOk) {}
+    // furi_check(furi_message_queue_put(view_dispatcher->queue, &message, FuriWaitForever) == FuriStatusOk);
 }
 
 void view_dispatcher_add_view(ViewDispatcher* view_dispatcher, uint32_t view_id, View* view) {
     // furi_assert(view_dispatcher);
     // furi_assert(view);
     // Check if view id is not used and register view
+    if(ViewDict_get(view_dispatcher->views, view_id) == NULL) {}
     // furi_check(ViewDict_get(view_dispatcher->views, view_id) == NULL);
 
     // Lock gui
@@ -161,6 +159,7 @@ void view_dispatcher_remove_view(ViewDispatcher* view_dispatcher, uint32_t view_
     }
     // Remove view
     ViewDict_erase(view_dispatcher->views, view_id);
+    // furi_check(ViewDict_erase(view_dispatcher->views, view_id));
 
     view_set_update_callback(view, NULL);
     view_set_update_callback_context(view, NULL);
@@ -216,24 +215,23 @@ void view_dispatcher_attach_to_gui(
 }
 
 void view_dispatcher_draw_callback(Canvas* canvas, void* context) {
-    ViewDispatcher* view_dispatcher = context;
+    ViewDispatcher* view_dispatcher = (ViewDispatcher*)context;
     if(view_dispatcher->current_view) {
         view_draw(view_dispatcher->current_view, canvas);
     }
 }
 
 void view_dispatcher_input_callback(InputEvent* event, void* context) {
-    ViewDispatcher* view_dispatcher = context;
-    // if(view_dispatcher->queue) {
-    //     ViewDispatcherMessage message;
-    //     message.type = ViewDispatcherMessageTypeInput;
-    //     message.input = *event;
-    //     // furi_check(
-    //     //     furi_message_queue_put(view_dispatcher->queue, &message, FuriWaitForever) ==
-    //     //     FuriStatusOk);
-    // } else {
+    ViewDispatcher* view_dispatcher = (ViewDispatcher*)context;
+    if(view_dispatcher->queue) {
+        ViewDispatcherMessage message;
+        message.type = ViewDispatcherMessageTypeInput;
+        message.input = *event;
+        if(furi_message_queue_put(view_dispatcher->queue, &message, FuriWaitForever) == FuriStatusOk) {}
+        // furi_check(furi_message_queue_put(view_dispatcher->queue, &message, FuriWaitForever) == FuriStatusOk);
+    } else {
         view_dispatcher_handle_input(view_dispatcher, event);
-    // }
+    }
 }
 
 void view_dispatcher_handle_input(ViewDispatcher* view_dispatcher, InputEvent* event) {
@@ -244,12 +242,7 @@ void view_dispatcher_handle_input(ViewDispatcher* view_dispatcher, InputEvent* e
     } else if(event->type == InputTypeRelease) {
         view_dispatcher->ongoing_input &= ~key_bit;
     } else if(!(view_dispatcher->ongoing_input & key_bit)) {
-        // FURI_LOG_D(
-        //     TAG,
-        //     "non-complementary input, discarding key: %s, type: %s, sequence: %p",
-        //     input_get_key_name(event->key),
-        //     input_get_type_name(event->type),
-        //     (void*)event->sequence);
+        Serial.printf("non-complementary input, discarding key: %s, type: %s, sequence: %p\n", input_get_key_name(event->key), input_get_type_name(event->type), (void*)event->sequence);
         return;
     }
 
@@ -282,14 +275,13 @@ void view_dispatcher_handle_input(ViewDispatcher* view_dispatcher, InputEvent* e
             }
         }
     } else if(view_dispatcher->ongoing_input_view && event->type == InputTypeRelease) {
-        // FURI_LOG_D(
-        //     TAG,
-        //     "View changed while key press %p -> %p. Sending key: %s, type: %s, sequence: %p to previous view port",
-        //     view_dispatcher->ongoing_input_view,
-        //     view_dispatcher->current_view,
-        //     input_get_key_name(event->key),
-        //     input_get_type_name(event->type),
-        //     (void*)event->sequence);
+        Serial.printf(
+            "View changed while key press %p -> %p. Sending key: %s, type: %s, sequence: %p to previous view port\n",
+            view_dispatcher->ongoing_input_view,
+            view_dispatcher->current_view,
+            input_get_key_name(event->key),
+            input_get_type_name(event->type),
+            (void*)event->sequence);
         view_input(view_dispatcher->ongoing_input_view, event);
     }
 }
@@ -318,11 +310,10 @@ void view_dispatcher_send_custom_event(ViewDispatcher* view_dispatcher, uint32_t
     ViewDispatcherMessage message;
     message.type = ViewDispatcherMessageTypeCustomEvent;
     message.custom_event = event;
-
-    // furi_check(
-    //     furi_message_queue_put(view_dispatcher->queue, &message, FuriWaitForever) == FuriStatusOk);
+    if(furi_message_queue_put(view_dispatcher->queue, &message, FuriWaitForever) == FuriStatusOk) {}
+    // furi_check(furi_message_queue_put(view_dispatcher->queue, &message, FuriWaitForever) == FuriStatusOk);
 }
-//  TODO: Implement view_dispatcher_view_port_orientation_table
+
 // static const ViewPortOrientation view_dispatcher_view_port_orientation_table[] = {
 //     [ViewOrientationVertical] = ViewPortOrientationVertical,
 //     [ViewOrientationVerticalFlip] = ViewPortOrientationVerticalFlip,
@@ -340,21 +331,20 @@ void view_dispatcher_set_current_view(ViewDispatcher* view_dispatcher, View* vie
     view_dispatcher->current_view = view;
     // Dispatch view enter event
     if(view_dispatcher->current_view) {
-        // ViewPortOrientation orientation =
-        //     view_dispatcher_view_port_orientation_table[view->orientation];
-        // if(view_port_get_orientation(view_dispatcher->view_port) != orientation) {
-        //     view_port_set_orientation(view_dispatcher->view_port, orientation);
-        //     // we just rotated input keys, now it's time to sacrifice some input
-        //     view_dispatcher->ongoing_input = 0;
-        // }
+        ViewPortOrientation orientation = ViewPortOrientationVertical; //view_dispatcher_view_port_orientation_table[view->orientation];
+        if(view_port_get_orientation(view_dispatcher->view_port) != orientation) {
+            view_port_set_orientation(view_dispatcher->view_port, orientation);
+            // we just rotated input keys, now it's time to sacrifice some input
+            view_dispatcher->ongoing_input = 0;
+        }
         view_enter(view_dispatcher->current_view);
         view_port_enabled_set(view_dispatcher->view_port, true);
         view_port_update(view_dispatcher->view_port);
     } else {
         view_port_enabled_set(view_dispatcher->view_port, false);
-        // if(view_dispatcher->queue) {
-        //     view_dispatcher_stop(view_dispatcher);
-        // }
+        if(view_dispatcher->queue) {
+            view_dispatcher_stop(view_dispatcher);
+        }
     }
 }
 
@@ -362,7 +352,7 @@ void view_dispatcher_update(View* view, void* context) {
     // furi_assert(view);
     // furi_assert(context);
 
-    ViewDispatcher* view_dispatcher = context;
+    ViewDispatcher* view_dispatcher = (ViewDispatcher*)context;
 
     if(view_dispatcher->current_view == view) {
         view_port_update(view_dispatcher->view_port);

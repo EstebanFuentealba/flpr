@@ -54,7 +54,9 @@ static void storage_app_sd_icon_draw_callback(Canvas* canvas, void* context) {
     case StorageStatusNotReady:
         break;
     case StorageStatusOK:
+        canvas_set_color(canvas, ColorBlack);
         canvas_draw_icon(canvas, 0, 0, ICON_SD_MOUNTED);
+        canvas_set_color(canvas, ColorWhite);
         break;
     default:
         canvas_draw_icon(canvas, 0, 0, ICON_SD_ERROR);
@@ -126,22 +128,22 @@ void storage_tick(Storage* app) {
     }
 }
 
-// int32_t storage_srv(void* p) {
-//     UNUSED(p);
-//     Storage* app = storage_app_alloc();
-//     furi_record_create(RECORD_STORAGE, app);
+int32_t storage_srv(void* p) {
+    // UNUSED(p);
+    Storage* app = storage_app_alloc();
+    furi_record_create(RECORD_STORAGE, app);
 
-//     StorageMessage message;
-//     while(1) {
-//         if(furi_message_queue_get(app->message_queue, &message, STORAGE_TICK) == FuriStatusOk) {
-//             storage_process_message(app, &message);
-//         } else {
-//             storage_tick(app);
-//         }
-//     }
+    StorageMessage message;
+    while(1) {
+        if(furi_message_queue_get(app->message_queue, &message, STORAGE_TICK) == FuriStatusOk) {
+            // storage_process_message(app, &message);
+        } else {
+            storage_tick(app);
+        }
+    }
 
-//     return 0;
-// }
+    return 0;
+}
 
 
 /*

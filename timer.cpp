@@ -1,80 +1,138 @@
 #include "timer.h"
-#include <Arduino.h>
+// #include "check.h"
+// #include "memmgr.h"
+#include "kernel.h"
 
-struct FuriTimerImpl {
-    FuriTimerCallback callback;
-    FuriTimerType type;
+#include "freertos/FreeRTOS.h"
+#include "freertos/timers.h"
+
+typedef struct {
+    FuriTimerCallback func;
     void* context;
-    unsigned long interval;
-    unsigned long previousMillis;
-    bool running;
-};
+} TimerCallback_t;
+
+static void TimerCallback(TimerHandle_t hTimer) {
+    TimerCallback_t* callb;
+
+    /* Retrieve pointer to callback function and context */
+    callb = (TimerCallback_t*)pvTimerGetTimerID(hTimer);
+
+    /* Remove dynamic allocation flag */
+    callb = (TimerCallback_t*)((uint32_t)callb & ~1U);
+
+    if(callb != NULL) {
+        callb->func(callb->context);
+    }
+}
 
 FuriTimer* furi_timer_alloc(FuriTimerCallback func, FuriTimerType type, void* context) {
-    FuriTimerImpl* timer = new FuriTimerImpl;
-    timer->callback = func;
-    timer->type = type;
-    timer->context = context;
-    timer->interval = 0;
-    timer->previousMillis = 0;
-    timer->running = false;
-    return reinterpret_cast<FuriTimer*>(timer);
+    // furi_assert((furi_kernel_is_irq_or_masked() == 0U) && (func != NULL));
+
+    TimerHandle_t hTimer;
+    TimerCallback_t* callb;
+    UBaseType_t reload;
+
+    hTimer = NULL;
+
+    /* Dynamic memory allocation is available: if memory for callback and */
+    /* its context is not provided, allocate it from dynamic memory pool */
+    callb = (TimerCallback_t*)malloc(sizeof(TimerCallback_t));
+
+    callb->func = func;
+    callb->context = context;
+
+    if(type == FuriTimerTypeOnce) {
+        reload = pdFALSE;
+    } else {
+        reload = pdTRUE;
+    }
+
+    /* Store callback memory dynamic allocation flag */
+    callb = (TimerCallback_t*)((uint32_t)callb | 1U);
+    // TimerCallback function is always provided as a callback and is used to call application
+    // specified function with its context both stored in structure callb.
+    hTimer = xTimerCreate(NULL, 1, reload, callb, TimerCallback);
+    // furi_check(hTimer);
+
+    /* Return timer ID */
+    return ((FuriTimer*)hTimer);
 }
 
 void furi_timer_free(FuriTimer* instance) {
-    delete reinterpret_cast<FuriTimerImpl*>(instance);
-}
+    // furi_assert(!furi_kernel_is_irq_or_masked());
+    // furi_assert(instance);
 
-static void furi_timer_handle_callback(void* arg) {
-    FuriTimerImpl* timer = reinterpret_cast<FuriTimerImpl*>(arg);
-    if (timer->callback) {
-        timer->callback(timer->context);
-        if (timer->type == FuriTimerTypeOnce) {
-            timer->running = false;
-        }
+    TimerHandle_t hTimer = (TimerHandle_t)instance;
+    TimerCallback_t* callb;
+
+    callb = (TimerCallback_t*)pvTimerGetTimerID(hTimer);
+
+    if(xTimerDelete(hTimer, portMAX_DELAY) == pdPASS) {}
+    // furi_check(xTimerDelete(hTimer, portMAX_DELAY) == pdPASS);
+
+    while(furi_timer_is_running(instance)) furi_delay_tick(2);
+
+    if((uint32_t)callb & 1U) {
+        /* Callback memory was allocated from dynamic pool, clear flag */
+        callb = (TimerCallback_t*)((uint32_t)callb & ~1U);
+
+        /* Return allocated memory to dynamic pool */
+        free(callb);
     }
 }
 
 FuriStatus furi_timer_start(FuriTimer* instance, uint32_t ticks) {
-    FuriTimerImpl* timer = reinterpret_cast<FuriTimerImpl*>(instance);
-    timer->interval = ticks;
-    timer->previousMillis = millis();
-    timer->running = true;
-    if (timer->interval > 0) {
-        esp_timer_create_args_t timerArgs;
-        timerArgs.callback = furi_timer_handle_callback;
-        timerArgs.arg = timer;
-        timerArgs.dispatch_method = ESP_TIMER_TASK;
-        timerArgs.name = "furi_timer";
-        esp_timer_handle_t timerHandle;
-        esp_timer_create(&timerArgs, &timerHandle);
-        esp_timer_start_periodic(timerHandle, timer->interval * 1000);
-        timer->context = reinterpret_cast<void*>(timerHandle);
+    // furi_assert(!furi_kernel_is_irq_or_masked());
+    // furi_assert(instance);
+
+    TimerHandle_t hTimer = (TimerHandle_t)instance;
+    FuriStatus stat;
+
+    if(xTimerChangePeriod(hTimer, ticks, portMAX_DELAY) == pdPASS) {
+        stat = FuriStatusOk;
+    } else {
+        stat = FuriStatusErrorResource;
     }
-    return 1;
+
+    /* Return execution status */
+    return (stat);
 }
 
 FuriStatus furi_timer_stop(FuriTimer* instance) {
-    FuriTimerImpl* timer = reinterpret_cast<FuriTimerImpl*>(instance);
-    timer->running = false;
-    if (timer->interval > 0) {
-        esp_timer_handle_t timerHandle = reinterpret_cast<esp_timer_handle_t>(timer->context);
-        esp_timer_stop(timerHandle);
-        esp_timer_delete(timerHandle);
-        timer->context = nullptr;
+    // furi_assert(!furi_kernel_is_irq_or_masked());
+    // furi_assert(instance);
+
+    TimerHandle_t hTimer = (TimerHandle_t)instance;
+    FuriStatus stat;
+
+    if(xTimerIsTimerActive(hTimer) == pdFALSE) {
+        stat = FuriStatusErrorResource;
+    } else {
+        if(xTimerStop(hTimer, portMAX_DELAY) == pdPASS) {}
+        // furi_check(xTimerStop(hTimer, portMAX_DELAY) == pdPASS);
+        stat = FuriStatusOk;
     }
-    return 1;
+
+    /* Return execution status */
+    return (stat);
 }
 
 uint32_t furi_timer_is_running(FuriTimer* instance) {
-    FuriTimerImpl* timer = reinterpret_cast<FuriTimerImpl*>(instance);
-    return timer->running ? 1 : 0;
+    // furi_assert(!furi_kernel_is_irq_or_masked());
+    // furi_assert(instance);
+
+    TimerHandle_t hTimer = (TimerHandle_t)instance;
+
+    /* Return 0: not running, 1: running */
+    return (uint32_t)xTimerIsTimerActive(hTimer);
 }
 
-void furi_delay_tick(uint32_t ticks) {
-    vTaskDelay(ticks / portTICK_PERIOD_MS);
-}
-
-uint32_t furi_kernel_get_tick_frequency() {
-    return configTICK_RATE_HZ;
+void furi_timer_pending_callback(FuriTimerPendigCallback callback, void* context, uint32_t arg) {
+    BaseType_t ret = pdFAIL;
+    if(furi_kernel_is_irq_or_masked()) {
+        ret = xTimerPendFunctionCallFromISR(callback, context, arg, NULL);
+    } else {
+        ret = xTimerPendFunctionCall(callback, context, arg, FuriWaitForever);
+    }
+    // furi_check(ret == pdPASS);
 }

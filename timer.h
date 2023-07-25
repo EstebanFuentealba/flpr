@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef TIMER_H
-#define TIMER_H
-
 #include "base.h"
 
 #ifdef __cplusplus
@@ -63,11 +60,6 @@ typedef void (*FuriTimerPendigCallback)(void* context, uint32_t arg);
 
 void furi_timer_pending_callback(FuriTimerPendigCallback callback, void* context, uint32_t arg);
 
-
-void furi_delay_tick(uint32_t ticks);
-uint32_t furi_kernel_get_tick_frequency();
 #ifdef __cplusplus
 }
 #endif
-
-#endif // TIMER_H

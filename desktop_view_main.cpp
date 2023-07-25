@@ -99,6 +99,7 @@ bool desktop_main_input_callback(InputEvent* event, void* context) {
 }
 
 DesktopMainView* desktop_main_alloc() {
+    Serial.println("[desktop_view_main] desktop_main_alloc");
     DesktopMainView* main_view = (DesktopMainView*) malloc(sizeof(DesktopMainView));
 
     main_view->view = view_alloc();

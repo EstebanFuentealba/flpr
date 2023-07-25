@@ -11,7 +11,7 @@
 #define TAG "LoaderMenu"
 
 struct LoaderMenu {
-    // FuriThread* thread;
+    FuriThread* thread;
     void (*closed_cb)(void*);
     void* context;
 };
@@ -22,15 +22,15 @@ LoaderMenu* loader_menu_alloc(void (*closed_cb)(void*), void* context) {
     LoaderMenu* loader_menu = (LoaderMenu*)malloc(sizeof(LoaderMenu));
     loader_menu->closed_cb = closed_cb;
     loader_menu->context = context;
-    // loader_menu->thread = furi_thread_alloc_ex(TAG, 1024, loader_menu_thread, loader_menu);
-    // furi_thread_start(loader_menu->thread);
+    loader_menu->thread = furi_thread_alloc_ex(TAG, 1024, loader_menu_thread, loader_menu);
+    furi_thread_start(loader_menu->thread);
     return loader_menu;
 }
 
 void loader_menu_free(LoaderMenu* loader_menu) {
     // furi_assert(loader_menu);
-    // furi_thread_join(loader_menu->thread);
-    // furi_thread_free(loader_menu->thread);
+    furi_thread_join(loader_menu->thread);
+    furi_thread_free(loader_menu->thread);
     free(loader_menu);
 }
 

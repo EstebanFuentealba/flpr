@@ -90,13 +90,9 @@ void desktop_scene_main_on_enter(void* context) {
     DesktopMainView* main_view = desktop->main_view;
 
     animation_manager_set_context(desktop->animation_manager, desktop);
-    animation_manager_set_new_idle_callback(
-        desktop->animation_manager, desktop_scene_main_new_idle_animation_callback);
-    animation_manager_set_check_callback(
-        desktop->animation_manager, desktop_scene_main_check_animation_callback);
-    animation_manager_set_interact_callback(
-        desktop->animation_manager, desktop_scene_main_interact_animation_callback);
-
+    animation_manager_set_new_idle_callback(desktop->animation_manager, desktop_scene_main_new_idle_animation_callback);
+    animation_manager_set_check_callback(desktop->animation_manager, desktop_scene_main_check_animation_callback);
+    animation_manager_set_interact_callback(desktop->animation_manager, desktop_scene_main_interact_animation_callback);
     desktop_main_set_callback(main_view, desktop_scene_main_callback, desktop);
 
     view_dispatcher_switch_to_view(desktop->view_dispatcher, DesktopViewIdMain);

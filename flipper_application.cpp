@@ -313,12 +313,12 @@ FuriThread* flipper_application_alloc_thread(FlipperApplication* app, const char
 //     return preload_status_strings[status];
 // }
 
-// const char* flipper_application_load_status_to_string(FlipperApplicationLoadStatus status) {
-//     if(status >= COUNT_OF(load_status_strings) || load_status_strings[status] == NULL) {
-//         return "Unknown error";
-//     }
-//     return load_status_strings[status];
-// }
+const char* flipper_application_load_status_to_string(FlipperApplicationLoadStatus status) {
+    if(status >= COUNT_OF(load_status_strings) || load_status_strings[status] == NULL) {
+        return "Unknown error";
+    }
+    return load_status_strings[status];
+}
 
 // const FlipperAppPluginDescriptor*
 //     flipper_application_plugin_get_descriptor(FlipperApplication* app) {

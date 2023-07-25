@@ -1,6 +1,6 @@
 #include "dialogs_message.h"
 #include "dialogs_i.h"
-// #include <toolbox/api_lock.h>
+#include "api_lock.h"
 #include "assets_icons.h"
 #include "storage.h"
 
@@ -11,7 +11,7 @@ bool dialog_file_browser_show(
     FuriString* result_path,
     FuriString* path,
     const DialogsFileBrowserOptions* options) {
-    // FuriApiLock lock = api_lock_alloc_locked();
+    FuriApiLock lock = api_lock_alloc_locked();
     // furi_check(lock != NULL);
 
     Storage* storage = (Storage*) furi_record_open(RECORD_STORAGE);
@@ -53,10 +53,10 @@ bool dialog_file_browser_show(
         .data = &data,
         .return_data = &return_data,
     };
-    // furi_message_queue_put(context->message_queue, &message, FuriWaitForever);
+    if(furi_message_queue_put(context->message_queue, &message, FuriWaitForever) == FuriStatusOk) {}
     // furi_check(
     //     furi_message_queue_put(context->message_queue, &message, FuriWaitForever) == FuriStatusOk);
-    // api_lock_wait_unlock_and_free(lock);
+    api_lock_wait_unlock_and_free(lock);
 
     furi_record_close(RECORD_STORAGE);
     furi_string_free(base_path);
@@ -67,7 +67,7 @@ bool dialog_file_browser_show(
 /****************** Message ******************/
 
 DialogMessageButton dialog_message_show(DialogsApp* context, const DialogMessage* dialog_message) {
-    // FuriApiLock lock = api_lock_alloc_locked();
+    FuriApiLock lock = api_lock_alloc_locked();
     // furi_check(lock != NULL);
 
     DialogsAppData data = {
@@ -82,10 +82,10 @@ DialogMessageButton dialog_message_show(DialogsApp* context, const DialogMessage
         .data = &data,
         .return_data = &return_data,
     };
-
+    if(furi_message_queue_put(context->message_queue, &message, FuriWaitForever) == FuriStatusOk) {}
     // furi_check(
     //     furi_message_queue_put(context->message_queue, &message, FuriWaitForever) == FuriStatusOk);
-    // api_lock_wait_unlock_and_free(lock);
+    api_lock_wait_unlock_and_free(lock);
 
     return return_data.dialog_value;
 }

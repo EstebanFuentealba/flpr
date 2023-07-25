@@ -32,7 +32,7 @@
 // const int pin_button_up = 27;
 const GpioPin gpio_button_down = {.pin = 32};
 const GpioPin gpio_button_up = {.pin = 25};
-const GpioPin gpio_button_left = {.pin = 16};
+const GpioPin gpio_button_left = {.pin = 14};
 const GpioPin gpio_button_right = {.pin = 26};
 const GpioPin gpio_button_ok = {.pin = 27};
 const GpioPin gpio_button_back = {.pin = 33};
@@ -101,6 +101,12 @@ const size_t gpio_pins_count = COUNT_OF(input_pins);
 const size_t input_pins_count = sizeof(input_pins) / sizeof(InputPin);
 
 
+static void furi_hal_resources_init_input_pins() {
+    for(size_t i = 0; i < input_pins_count; i++) {
+        pinMode(input_pins[i].gpio->pin, INPUT_PULLUP);
+    }
+}
+
 void furi_hal_resources_init_early() {
     //  TODO:
 }
@@ -110,8 +116,18 @@ void furi_hal_resources_deinit_early() {
 }
 
 void furi_hal_resources_init() {
-    pinMode(gpio_button_down.pin, INPUT_PULLUP);
-    //  TODO: Add modules
+    furi_hal_resources_init_input_pins();
+    // SD Card stepdown control
+
+    // Display pins
+
+    // Alternative pull configuration for shutdown
+
+    // Hard reset USB
+
+    // External header pins
+
+
     Serial.println("[furi_hal_resources] furi_hal_resources_init");
 }
 

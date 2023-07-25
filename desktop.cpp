@@ -46,7 +46,10 @@ static void desktop_lock_icon_draw_callback(Canvas* canvas, void* context) {
 static void desktop_dummy_mode_icon_draw_callback(Canvas* canvas, void* context) {
     // UNUSED(context);
     // furi_assert(canvas);
+    // canvas_set_color(canvas, INVERSE);
+    canvas_set_color(canvas, ColorBlack);
     canvas_draw_icon(canvas, 0, 0, &I_GameMode_11x8);
+    canvas_set_color(canvas, ColorWhite);
 }
 
 static void desktop_stealth_mode_icon_draw_callback(Canvas* canvas, void* context) {
@@ -198,23 +201,21 @@ void desktop_set_stealth_mode_state(Desktop* desktop, bool enabled) {
 Desktop* desktop_alloc() {
     Desktop* desktop = (Desktop*)malloc(sizeof(Desktop));
 
+    Serial.println("[desktop] malloc");
     desktop->animation_manager = animation_manager_alloc();
+
+    Serial.println("[desktop] animation_manager_alloc");
     desktop->gui = (Gui*)furi_record_open(RECORD_GUI);
-    // desktop->scene_thread = furi_thread_alloc();
+    desktop->scene_thread = furi_thread_alloc();
     desktop->view_dispatcher = view_dispatcher_alloc();
     desktop->scene_manager = scene_manager_alloc(&desktop_scene_handlers, desktop);
-
+    
     view_dispatcher_enable_queue(desktop->view_dispatcher);
-    view_dispatcher_attach_to_gui(
-        desktop->view_dispatcher, desktop->gui, ViewDispatcherTypeDesktop);
-    view_dispatcher_set_tick_event_callback(
-        desktop->view_dispatcher, desktop_tick_event_callback, 500);
-
+    view_dispatcher_attach_to_gui(desktop->view_dispatcher, desktop->gui, ViewDispatcherTypeDesktop);
+    view_dispatcher_set_tick_event_callback(desktop->view_dispatcher, desktop_tick_event_callback, 500);
     view_dispatcher_set_event_callback_context(desktop->view_dispatcher, desktop);
-    view_dispatcher_set_custom_event_callback(
-        desktop->view_dispatcher, desktop_custom_event_callback);
-    view_dispatcher_set_navigation_event_callback(
-        desktop->view_dispatcher, desktop_back_event_callback);
+    view_dispatcher_set_custom_event_callback(desktop->view_dispatcher, desktop_custom_event_callback);
+    view_dispatcher_set_navigation_event_callback(desktop->view_dispatcher, desktop_back_event_callback);
 
     desktop->lock_menu = desktop_lock_menu_alloc();
     desktop->debug_view = desktop_debug_alloc();
@@ -246,32 +247,30 @@ Desktop* desktop_alloc() {
     view_dispatcher_add_view( desktop->view_dispatcher, DesktopViewIdPinInput, desktop_view_pin_input_get_view(desktop->pin_input_view));
     view_dispatcher_add_view( desktop->view_dispatcher, DesktopViewIdSlideshow, desktop_view_slideshow_get_view(desktop->slideshow_view));
 
-    // Lock icon
-    desktop->lock_icon_viewport = view_port_alloc();
-    view_port_set_width(desktop->lock_icon_viewport, icon_get_width(&I_Lock_7x8));
-    view_port_draw_callback_set( desktop->lock_icon_viewport, desktop_lock_icon_draw_callback, desktop);
-    view_port_enabled_set(desktop->lock_icon_viewport, false);
-    gui_add_view_port(desktop->gui, desktop->lock_icon_viewport, GuiLayerStatusBarLeft);
+    // // Lock icon
+    // desktop->lock_icon_viewport = view_port_alloc();
+    // view_port_set_width(desktop->lock_icon_viewport, icon_get_width(&I_Lock_7x8));
+    // view_port_draw_callback_set( desktop->lock_icon_viewport, desktop_lock_icon_draw_callback, desktop);
+    // view_port_enabled_set(desktop->lock_icon_viewport, false);
+    // gui_add_view_port(desktop->gui, desktop->lock_icon_viewport, GuiLayerStatusBarLeft);
 
-    // Dummy mode icon
-    desktop->dummy_mode_icon_viewport = view_port_alloc();
-    view_port_set_width(desktop->dummy_mode_icon_viewport, icon_get_width(&I_GameMode_11x8));
-    view_port_draw_callback_set(
-        desktop->dummy_mode_icon_viewport, desktop_dummy_mode_icon_draw_callback, desktop);
-    view_port_enabled_set(desktop->dummy_mode_icon_viewport, false);
-    gui_add_view_port(desktop->gui, desktop->dummy_mode_icon_viewport, GuiLayerStatusBarLeft);
+    // // Dummy mode icon
+    // desktop->dummy_mode_icon_viewport = view_port_alloc();
+    // view_port_set_width(desktop->dummy_mode_icon_viewport, icon_get_width(&I_GameMode_11x8));
+    // view_port_draw_callback_set(desktop->dummy_mode_icon_viewport, desktop_dummy_mode_icon_draw_callback, desktop);
+    // view_port_enabled_set(desktop->dummy_mode_icon_viewport, false);
+    // gui_add_view_port(desktop->gui, desktop->dummy_mode_icon_viewport, GuiLayerStatusBarLeft);
 
-    // Stealth mode icon
-    desktop->stealth_mode_icon_viewport = view_port_alloc();
-    view_port_set_width(desktop->stealth_mode_icon_viewport, icon_get_width(&I_Muted_8x8));
-    view_port_draw_callback_set(
-        desktop->stealth_mode_icon_viewport, desktop_stealth_mode_icon_draw_callback, desktop);
-    // if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagStealthMode)) {
-    //     view_port_enabled_set(desktop->stealth_mode_icon_viewport, true);
-    // } else {
-        view_port_enabled_set(desktop->stealth_mode_icon_viewport, false);
-    // }
-    gui_add_view_port(desktop->gui, desktop->stealth_mode_icon_viewport, GuiLayerStatusBarLeft);
+    // // Stealth mode icon
+    // desktop->stealth_mode_icon_viewport = view_port_alloc();
+    // view_port_set_width(desktop->stealth_mode_icon_viewport, icon_get_width(&I_Muted_8x8));
+    // view_port_draw_callback_set(desktop->stealth_mode_icon_viewport, desktop_stealth_mode_icon_draw_callback, desktop);
+    // // if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagStealthMode)) {
+    // //     view_port_enabled_set(desktop->stealth_mode_icon_viewport, true);
+    // // } else {
+    //     view_port_enabled_set(desktop->stealth_mode_icon_viewport, false);
+    // // }
+    // gui_add_view_port(desktop->gui, desktop->stealth_mode_icon_viewport, GuiLayerStatusBarLeft);
 
     // Special case: autostart application is already running
     desktop->loader = (Loader*)furi_record_open(RECORD_LOADER);
@@ -281,18 +280,17 @@ Desktop* desktop_alloc() {
     }
 
     // desktop->notification = furi_record_open(RECORD_NOTIFICATION);
-    desktop->app_start_stop_subscription = furi_pubsub_subscribe(
-        loader_get_pubsub(desktop->loader), desktop_loader_callback, desktop);
+    desktop->app_start_stop_subscription = furi_pubsub_subscribe(loader_get_pubsub(desktop->loader), desktop_loader_callback, desktop);
 
     desktop->input_events_pubsub = (FuriPubSub*)furi_record_open(RECORD_INPUT_EVENTS);
     desktop->input_events_subscription = NULL;
 
-    desktop->auto_lock_timer =
-        furi_timer_alloc(desktop_auto_lock_timer_callback, FuriTimerTypeOnce, desktop);
+    desktop->auto_lock_timer = furi_timer_alloc(desktop_auto_lock_timer_callback, FuriTimerTypeOnce, desktop);
 
     desktop->status_pubsub = furi_pubsub_alloc();
 
     furi_record_create(RECORD_DESKTOP, desktop);
+    
 
     return desktop;
 }
@@ -321,55 +319,65 @@ FuriPubSub* desktop_api_get_status_pubsub(Desktop* instance) {
     return instance->status_pubsub;
 }
 
-// int32_t desktop_srv(void* p) {
-//     // UNUSED(p);
+int32_t desktop_srv(void* p) {
+    // UNUSED(p);
 
-//     // if(furi_hal_rtc_get_boot_mode() != FuriHalRtcBootModeNormal) {
-//     //     FURI_LOG_W(TAG, "Skipping start in special boot mode");
-//     //     return 0;
-//     // }
+    // if(furi_hal_rtc_get_boot_mode() != FuriHalRtcBootModeNormal) {
+    //     FURI_LOG_W(TAG, "Skipping start in special boot mode");
+    //     return 0;
+    // }
+    Serial.println("[desktop] desktop_srv");
+    Desktop* desktop = desktop_alloc();
 
-//     Desktop* desktop = desktop_alloc();
+    desktop->settings.favorite_primary = {};
+    desktop->settings.favorite_secondary = {};
+    desktop->settings.pin_code.data[0] = InputKeyUp;
+    desktop->settings.pin_code.data[1] = InputKeyUp;
+    desktop->settings.pin_code.data[2] = InputKeyUp;
+    desktop->settings.pin_code.data[3] = InputKeyUp;
+    desktop->settings.pin_code.length = 4;
+    desktop->settings.auto_lock_delay_ms = 5000;
+    desktop->settings.dummy_mode = true;
 
-//     bool loaded = DESKTOP_SETTINGS_LOAD(&desktop->settings);
-//     if(!loaded) {
-//         memset(&desktop->settings, 0, sizeof(desktop->settings));
-//         DESKTOP_SETTINGS_SAVE(&desktop->settings);
-//     }
+    // bool loaded = DESKTOP_SETTINGS_LOAD(&desktop->settings);
+    // if(!loaded) {
+    //     memset(&desktop->settings, 0, sizeof(desktop->settings));
+    //     DESKTOP_SETTINGS_SAVE(&desktop->settings);
+    // }
 
-//     view_port_enabled_set(desktop->dummy_mode_icon_viewport, desktop->settings.dummy_mode);
-//     desktop_main_set_dummy_mode_state(desktop->main_view, desktop->settings.dummy_mode);
-//     animation_manager_set_dummy_mode_state(
-//         desktop->animation_manager, desktop->settings.dummy_mode);
+    view_port_enabled_set(desktop->dummy_mode_icon_viewport, desktop->settings.dummy_mode);
+    desktop_main_set_dummy_mode_state(desktop->main_view, desktop->settings.dummy_mode);
+    animation_manager_set_dummy_mode_state(
+        desktop->animation_manager, desktop->settings.dummy_mode);
 
-//     scene_manager_next_scene(desktop->scene_manager, DesktopSceneMain);
+    scene_manager_next_scene(desktop->scene_manager, DesktopSceneMain);
 
-//     // if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagLock)) {
-//     //     desktop_lock(desktop);
-//     // } else {
-//         if(!loader_is_locked(desktop->loader)) {
-//             desktop_auto_lock_arm(desktop);
-//         }
-//     // }
+    // if(furi_hal_rtc_is_flag_set(FuriHalRtcFlagLock)) {
+    //     desktop_lock(desktop);
+    // } else {
+        // if(!loader_is_locked(desktop->loader)) {
+        //     desktop_auto_lock_arm(desktop);
+        // }
+    // }
 
-//     if(desktop_check_file_flag(SLIDESHOW_FS_PATH)) {
-//         scene_manager_next_scene(desktop->scene_manager, DesktopSceneSlideshow);
-//     }
+    // if(desktop_check_file_flag(SLIDESHOW_FS_PATH)) {
+    //     scene_manager_next_scene(desktop->scene_manager, DesktopSceneSlideshow);
+    // }
 
-//     // if(!furi_hal_version_do_i_belong_here()) {
-//     //     scene_manager_next_scene(desktop->scene_manager, DesktopSceneHwMismatch);
-//     // }
+    // if(!furi_hal_version_do_i_belong_here()) {
+    //     scene_manager_next_scene(desktop->scene_manager, DesktopSceneHwMismatch);
+    // }
 
-//     // if(furi_hal_rtc_get_fault_data()) {
-//     //     scene_manager_next_scene(desktop->scene_manager, DesktopSceneFault);
-//     // }
+    // if(furi_hal_rtc_get_fault_data()) {
+    //     scene_manager_next_scene(desktop->scene_manager, DesktopSceneFault);
+    // }
 
-//     view_dispatcher_run(desktop->view_dispatcher);
+    view_dispatcher_run(desktop->view_dispatcher);
 
-//     // furi_crash("That was unexpected");
+    // furi_crash("That was unexpected");
 
-//     return 0;
-// }
+    return 0;
+}
 
 void desktop_setup() {
     
@@ -390,7 +398,7 @@ void desktop_setup() {
     desktop->settings.pin_code.data[3] = InputKeyUp;
     desktop->settings.pin_code.length = 4;
     desktop->settings.auto_lock_delay_ms = 5000;
-    desktop->settings.dummy_mode = true;
+    desktop->settings.dummy_mode = false;
     // bool loaded = DESKTOP_SETTINGS_LOAD(&desktop->settings);
     // if(!loaded) {
     //     memset(&desktop->settings, 0, sizeof(desktop->settings));

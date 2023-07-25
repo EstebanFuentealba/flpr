@@ -16,7 +16,7 @@ const CanvasFontParameters canvas_font_params[FontTotalNumber] = {
 };
 
 
-
+uint16_t currentTextColor = ColorWhite; 
 // Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // U8G2_SSD1306_128X64_NONAME_F_4W_HW_SPI u8g2(SSD1306_SWITCHCAPVCC, /* cs=/ 5, / dc=/ 32, / reset=*/ 4);
@@ -66,6 +66,10 @@ void canvas_clear(Canvas* canvas) {
 
 void canvas_set_color(Canvas* canvas, uint16_t color) {
     canvas->display->setTextColor(color);
+    // if(currentTextColor != color) {
+    //     currentTextColor = color;
+    // }
+    
 }
 void canvas_set_color_white(Canvas* canvas) {
     canvas->display->setTextColor(WHITE);
@@ -194,8 +198,8 @@ static void canvas_draw_u8g2_bitmap_int(
         int16_t x0 = x;
         int16_t y0 = y;
         uint8_t mask;
-        uint16_t color = WHITE; // Set the color you want to use for drawing
-        uint16_t ncolor = BLACK; // Set the color for the background
+        uint16_t color = WHITE;//currentTextColor == ColorWhite ? WHITE : BLACK; // Set the color you want to use for drawing
+        uint16_t ncolor = BLACK;// currentTextColor == ColorWhite ? BLACK : WHITE; // Set the color for the background
         mask = 1;
 
         while(len > 0) {
@@ -509,8 +513,18 @@ uint8_t canvas_height(const Canvas* canvas) {
 //     return strlen(str) * (6 * 1); // 6 is the character width in pixels
 // }
 
-void canvas_draw_bitmap(Canvas* canvas, uint8_t x, uint8_t y, uint8_t width, uint8_t height, const uint8_t* bitmap) {
-    canvas->display->drawBitmap( x, y, bitmap, width, height, WHITE);
+void canvas_draw_bitmap(Canvas* canvas,
+    uint8_t x,
+    uint8_t y,
+    uint8_t width,
+    uint8_t height,
+    const uint8_t* compressed_bitmap_data) {
+    // canvas->display->drawBitmap( x, y, bitmap, width, height, WHITE);
+    x += canvas->offset_x;
+    y += canvas->offset_y;
+    uint8_t* bitmap_data = NULL;
+    compress_icon_decode(canvas->compress_icon, compressed_bitmap_data, &bitmap_data);
+    canvas_draw_u8g2_bitmap(canvas, x, y, width, height, bitmap_data, IconRotation0);
 }
 void canvas_frame_set(
     Canvas* canvas,

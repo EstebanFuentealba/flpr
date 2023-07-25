@@ -6,6 +6,7 @@
 #pragma once
 
 #include "view.h"
+#include "furi.h"
 
 typedef struct {
     void* data;
@@ -31,7 +32,7 @@ struct View {
 };
 
 /** IconAnimation tie callback */
-void view_icon_animation_callback(Icon* instance, void* context);
+void view_icon_animation_callback(IconAnimation* instance, void* context);
 
 /** Unlock model */
 void view_unlock_model(View* view);

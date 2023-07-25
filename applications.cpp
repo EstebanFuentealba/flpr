@@ -6,13 +6,13 @@ const char* FLIPPER_AUTORUN_APP_NAME = "";
 // extern int32_t cli_srv(void* p);
 // extern int32_t dialogs_srv(void* p);
 // extern int32_t dolphin_srv(void* p);
-// extern int32_t desktop_srv(void* p);
+extern int32_t desktop_srv(void* p);
 extern int32_t gui_srv(void* p);
 extern int32_t input_srv(void* p);
 extern int32_t loader_srv(void* p);
 // extern int32_t notification_srv(void* p);
 // extern int32_t power_srv(void* p);
-// extern int32_t storage_srv(void* p);
+extern int32_t storage_srv(void* p);
 const FlipperInternalApplication FLIPPER_SERVICES[] = {
 
 //     // {.app = bt_srv,
@@ -43,20 +43,20 @@ const FlipperInternalApplication FLIPPER_SERVICES[] = {
 //     //  .icon = NULL,
 //     //  .flags = FlipperApplicationFlagDefault },
 
-//     // {.app = desktop_srv,
-//     //  .name = "DesktopSrv",
-//     //  .appid = "desktop", 
-//     //  .stack_size = 2048,
-//     //  .icon = NULL,
-//     //  .flags = FlipperApplicationFlagDefault },
+    {.app = desktop_srv,
+     .name = "DesktopSrv",
+     .appid = "desktop", 
+     .stack_size = 2048,
+     .icon = NULL,
+     .flags = FlipperInternalApplicationFlagDefault },
 
-    // {
-    //  .app = gui_srv,
-    //  .name = "GuiSrv",
-    //  .appid = "gui", 
-    //  .stack_size = 1024,
-    //  .icon = NULL,
-    //  .flags = FlipperInternalApplicationFlagDefault },
+    {
+     .app = gui_srv,
+     .name = "GuiSrv",
+     .appid = "gui", 
+     .stack_size = 1024,
+     .icon = NULL,
+     .flags = FlipperInternalApplicationFlagDefault },
     {.app = input_srv,
      .name = "InputSrv",
      .appid = "input", 
@@ -65,12 +65,12 @@ const FlipperInternalApplication FLIPPER_SERVICES[] = {
      .flags = FlipperInternalApplicationFlagDefault },
 
 
-    // {.app = loader_srv,
-    //  .name = "LoaderSrv",
-    //  .appid = "loader", 
-    //  .stack_size = 2048,
-    //  .icon = NULL,
-    //  .flags = FlipperInternalApplicationFlagDefault },
+    {.app = loader_srv,
+     .name = "LoaderSrv",
+     .appid = "loader", 
+     .stack_size = 2048,
+     .icon = NULL,
+     .flags = FlipperInternalApplicationFlagDefault },
 
 //     // {.app = notification_srv,
 //     //  .name = "NotificationSrv",
@@ -86,17 +86,17 @@ const FlipperInternalApplication FLIPPER_SERVICES[] = {
 //     //  .icon = NULL,
 //     //  .flags = FlipperApplicationFlagDefault },
 
-//     // {.app = storage_srv,
-//     //  .name = "StorageSrv",
-//     //  .appid = "storage", 
-//     //  .stack_size = 3072,
-//     //  .icon = NULL,
-//     //  .flags = FlipperApplicationFlagDefault }
+    {.app = storage_srv,
+     .name = "StorageSrv",
+     .appid = "storage", 
+     .stack_size = 3072,
+     .icon = NULL,
+     .flags = FlipperInternalApplicationFlagDefault }
 };
 const size_t FLIPPER_SERVICES_COUNT = COUNT_OF(FLIPPER_SERVICES);
 // extern int32_t updater_srv(void* p);
 // extern int32_t storage_move_to_sd_app(void* p);
-// const FlipperApplication FLIPPER_SYSTEM_APPS[] = {
+const FlipperInternalApplication  FLIPPER_SYSTEM_APPS[] = {
 
 //     // {.app = updater_srv,
 //     //  .name = "UpdaterApp",
@@ -111,18 +111,18 @@ const size_t FLIPPER_SERVICES_COUNT = COUNT_OF(FLIPPER_SERVICES);
 //     //  .stack_size = 2048,
 //     //  .icon = NULL,
 //     //  .flags = FlipperApplicationFlagDefault }
-// };
-// const size_t FLIPPER_SYSTEM_APPS_COUNT = COUNT_OF(FLIPPER_SYSTEM_APPS);
+};
+const size_t FLIPPER_SYSTEM_APPS_COUNT = COUNT_OF(FLIPPER_SYSTEM_APPS);
 // extern int32_t subghz_app(void* p);
 // extern int32_t lfrfid_app(void* p);
 // extern int32_t nfc_app(void* p);
-// extern int32_t infrared_app(void* p);
+extern int32_t infrared_app(void* p);
 // extern int32_t gpio_app(void* p);
 // extern int32_t ibutton_app(void* p);
 // extern int32_t bad_usb_app(void* p);
 // extern int32_t u2f_app(void* p);
 // extern int32_t fap_loader_app(void* p);
-// const FlipperApplication FLIPPER_APPS[] = {
+const FlipperInternalApplication FLIPPER_APPS[] = {
 
 //     // {.app = subghz_app,
 //     //  .name = "Sub-GHz",
@@ -145,12 +145,12 @@ const size_t FLIPPER_SERVICES_COUNT = COUNT_OF(FLIPPER_SERVICES);
 //     //  .icon = &A_NFC_14,
 //     //  .flags = FlipperApplicationFlagDefault },
 
-//     // {.app = infrared_app,
-//     //  .name = "Infrared",
-//     //  .appid = "infrared", 
-//     //  .stack_size = 3072,
-//     //  .icon = &A_Infrared_14,
-//     //  .flags = FlipperApplicationFlagDefault },
+    {.app = infrared_app,
+     .name = "Infrared",
+     .appid = "infrared", 
+     .stack_size = 3072,
+     .icon = &A_Infrared_14,
+     .flags = FlipperInternalApplicationFlagDefault },
 
 //     // {.app = gpio_app,
 //     //  .name = "GPIO",
@@ -186,8 +186,8 @@ const size_t FLIPPER_SERVICES_COUNT = COUNT_OF(FLIPPER_SERVICES);
 //     //  .stack_size = 1536,
 //     //  .icon = &A_Plugins_14,
 //     //  .flags = FlipperApplicationFlagDefault }
-// };
-// const size_t FLIPPER_APPS_COUNT = COUNT_OF(FLIPPER_APPS);
+};
+const size_t FLIPPER_APPS_COUNT = COUNT_OF(FLIPPER_APPS);
 // const FlipperApplication FLIPPER_DEBUG_APPS[] = {
 
 // };
@@ -200,7 +200,7 @@ const size_t FLIPPER_SERVICES_COUNT = COUNT_OF(FLIPPER_SERVICES);
 // extern int32_t passport_app(void* p);
 // extern int32_t system_settings_app(void* p);
 // extern int32_t about_settings_app(void* p);
-// const FlipperApplication FLIPPER_SETTINGS_APPS[] = {
+const FlipperInternalApplication FLIPPER_SETTINGS_APPS[] = {
 
     // {.app = bt_settings_app,
     //  .name = "Bluetooth",
@@ -257,8 +257,8 @@ const size_t FLIPPER_SERVICES_COUNT = COUNT_OF(FLIPPER_SERVICES);
     //  .stack_size = 1024,
     //  .icon = NULL,
     //  .flags = FlipperApplicationFlagDefault }
-// };
-// const size_t FLIPPER_SETTINGS_APPS_COUNT = COUNT_OF(FLIPPER_SETTINGS_APPS);
+};
+const size_t FLIPPER_SETTINGS_APPS_COUNT = COUNT_OF(FLIPPER_SETTINGS_APPS);
 // extern void crypto_on_system_start();
 // extern void rpc_on_system_start();
 // extern void infrared_on_system_start();
@@ -298,3 +298,9 @@ const size_t FLIPPER_ON_SYSTEM_START_COUNT = COUNT_OF(FLIPPER_ON_SYSTEM_START);
 //      .stack_size = 4096,
 //      .icon = &A_FileManager_14,
 //      .flags = FlipperApplicationFlagDefault };
+
+
+const FlipperExternalApplication FLIPPER_EXTERNAL_APPS[] = {
+
+};
+const size_t FLIPPER_EXTERNAL_APPS_COUNT = COUNT_OF(FLIPPER_EXTERNAL_APPS);

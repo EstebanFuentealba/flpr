@@ -37,7 +37,7 @@ typedef enum {
 
 struct Desktop {
     // Scene
-    // FuriThread* scene_thread;
+    FuriThread* scene_thread;
     // GUI
     Gui* gui;
     ViewDispatcher* view_dispatcher;

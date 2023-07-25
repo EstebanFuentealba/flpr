@@ -38,7 +38,7 @@ LoaderStatus
     message.start.error_message = error_message;
     message.api_lock = api_lock_alloc_locked();
     message.status_value = &result;
-    // furi_message_queue_put(loader->queue, &message, FuriWaitForever);
+    furi_message_queue_put(loader->queue, &message, FuriWaitForever);
     api_lock_wait_unlock_and_free(message.api_lock);
     return result.value;
 }
@@ -98,7 +98,7 @@ bool loader_lock(Loader* loader) {
 void loader_unlock(Loader* loader) {
     LoaderMessage message;
     message.type = LoaderMessageTypeUnlock;
-    // furi_message_queue_put(loader->queue, &message, FuriWaitForever);
+    furi_message_queue_put(loader->queue, &message, FuriWaitForever);
 }
 
 bool loader_is_locked(Loader* loader) {
@@ -365,7 +365,7 @@ static void loader_do_applications_closed(Loader* loader) {
 }
 
 static bool loader_do_is_locked(Loader* loader) {
-    // return loader->app.thread != NULL;
+    return loader->app.thread != NULL;
 }
 
 static LoaderStatus loader_do_start_by_name(
@@ -477,24 +477,22 @@ static void loader_do_app_closed(Loader* loader) {
 // app
 
 int32_t loader_srv(void* p) {
-    UNUSED(p);
     Loader* loader = loader_alloc();
     furi_record_create(RECORD_LOADER, loader);
 
     Serial.println("[loader] Executing system start hooks");
-    while(1) {}
+
     for(size_t i = 0; i < FLIPPER_ON_SYSTEM_START_COUNT; i++) {
         FLIPPER_ON_SYSTEM_START[i]();
     }
 
-    if(FLIPPER_AUTORUN_APP_NAME && strlen(FLIPPER_AUTORUN_APP_NAME)) {
-        loader_do_start_by_name(loader, FLIPPER_AUTORUN_APP_NAME, NULL, NULL);
-    }
-
+    // if(FLIPPER_AUTORUN_APP_NAME && strlen(FLIPPER_AUTORUN_APP_NAME)) {
+    //     loader_do_start_by_name(loader, FLIPPER_AUTORUN_APP_NAME, NULL, NULL);
+    // }
     LoaderMessage message;
     while(true) {
         
-        if(furi_message_queue_get(loader->queue, &message, FuriWaitForever) == FuriStatusOk) {
+        if(furi_message_queue_get(loader->queue, &message, 1000 /*FuriWaitForever*/) == FuriStatusOk) {
             switch(message.type) {
             case LoaderMessageTypeStartByName:
                 message.status_value->value = loader_do_start_by_name(

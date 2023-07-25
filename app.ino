@@ -2,8 +2,9 @@
 #include "flipper_format.h"
 #include "furi.h"
 #include "furi_hal.h"
-#include "storage.h"
+#include "storage_i.h"
 #include "dir_walk.h"
+#include "FS.h"
 #include "SD.h"
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
@@ -18,7 +19,7 @@
 #define ANIMATION_DIR "/dolphin"
 #define ANIMATION_MANIFEST_FILE ANIMATION_DIR "/manifest.txt"
 
-
+const char* manifest = "Filetype: Flipper Animation Manifest\nVersion: 1\n\nName: L3_Furippa3_128x64\nMin butthurt: 0\nMax butthurt: 6\nMin level: 3\nMax level: 3\nWeight: 3\n";
 
 void flipper_init() {
     // flipper_print_version("Firmware", furi_hal_version_get_firmware_version());
@@ -26,7 +27,7 @@ void flipper_init() {
     Serial.printf("Boot mode %d, starting services", 1);
 
     for(size_t i = 0; i < FLIPPER_SERVICES_COUNT; i++) {
-        Serial.printf("Starting service %s", FLIPPER_SERVICES[i].name);
+        Serial.printf("Starting service %s\n", FLIPPER_SERVICES[i].name);
 
         FuriThread* thread = furi_thread_alloc_ex(
             FLIPPER_SERVICES[i].name,
@@ -88,7 +89,23 @@ void setup() {
   Serial.begin(115200);
   Serial.println("setup");
 
-  
+//     File file = SD.open(ANIMATION_MANIFEST_FILE, FILE_WRITE);
+//     file.write((const uint8_t *)manifest, strlen(manifest));
+//     file.close();
+
+//     file = SD.open(ANIMATION_MANIFEST_FILE, FILE_READ);
+//     uint8_t buffer[128];
+//     uint16_t bytesRead;
+//     while (!file.available()) {
+//         bytesRead = file.read(buffer, sizeof(buffer));
+//         if (bytesRead > 0) {
+//             for (uint16_t i = 0; i < bytesRead; i++) {
+//                 Serial.write(buffer[i]);
+//             }
+//         }
+//     }
+// file.close();
+    
   // Initialize FURI layer
   furi_init();
   // // Flipper FURI HAL
@@ -120,7 +137,7 @@ void setup() {
   
   
   //  Run Kernel
-  // furi_run();
+  furi_run();
   
 
 
@@ -134,17 +151,17 @@ void setup() {
   // } else {
   //     Serial.println(F("Mounted SD Card"));
   // }
-   /*
+/*
   //  ### [ESCRIBE ARCHIVO DEMO]
  
   const char* name = "L3_Furippa3_128x64";
 
   Serial.println("try storage_file_alloc");
-  Storage* storage = (Storage*)furi_record_open(RECORD_STORAGE);
-  bool isCreated = storage_simply_mkdir(storage, "/dolphin");
+  // Storage* storage = (Storage*)furi_record_open(RECORD_STORAGE);
+  bool isCreated = storage_simply_mkdir(app, "/dolphin");
   Serial.println("isCreated:");
   Serial.println(isCreated);
-  FZFile* ff = storage_file_alloc(storage);
+  FZFile* ff = storage_file_alloc(app);
   bool result = storage_file_open(ff, ANIMATION_MANIFEST_FILE, FILE_WRITE);
   const char* manifest = "Filetype: Flipper Animation Manifest\nVersion: 1\n\nName: L3_Furippa3_128x64\nMin butthurt: 0\nMax butthurt: 6\nMin level: 3\nMax level: 3\nWeight: 3\n";
   storage_file_write(ff, manifest, strlen(manifest));
@@ -155,7 +172,7 @@ void setup() {
   //  ### [/ESCRIBE ARCHIVO DEMO]
 
   //  ### [LEE ARCHIVO DEMO]
-  ff = storage_file_alloc(storage);
+  ff = storage_file_alloc(app);
   result = storage_file_open(ff, ANIMATION_MANIFEST_FILE, FILE_READ);
   uint8_t buffer[128];
   uint16_t bytesRead;
@@ -173,7 +190,7 @@ void setup() {
 
 
   //  ### [LISTA DIRECTORIOS]
-  FZFile* dir = storage_file_alloc(storage);
+  FZFile* dir = storage_file_alloc(app);
   if(storage_dir_open(dir, "/" )) {
     Serial.println("storage_dir_open");
       FileInfo fileinfo;
@@ -204,10 +221,9 @@ void setup() {
   storage_dir_close(dir);
   storage_file_free(dir);
   //  ### [/LISTA DIRECTORIOS]
-  furi_record_close(RECORD_STORAGE);
 
-    */
-    
+  furi_record_close(RECORD_STORAGE);
+  */
 }
 void loop() {
 

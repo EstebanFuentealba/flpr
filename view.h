@@ -8,15 +8,14 @@
 #include "input.h"
 
 #include "icon_animation.h"
-// #include "icon_i.h"
 #include "canvas.h"
 
 #include <stddef.h>
 #include <stdint.h>
 
-// #ifdef __cplusplus
-// extern "C" {
-// #endif
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** Hides drawing view_port */
 #define VIEW_NONE 0xFFFFFFFF
@@ -209,18 +208,18 @@ void* view_get_model(View* view);
  */
 void view_commit_model(View* view, bool update);
 
-// #ifdef __cplusplus
-// }
-// #endif
+#ifdef __cplusplus
+}
+#endif
 
-// #ifdef __cplusplus
+#ifdef __cplusplus
 #define with_view_model_cpp(view, type, var, code, update)  \
     {                                                       \
         type var = static_cast<type>(view_get_model(view)); \
         {code};                                             \
         view_commit_model(view, update);                    \
     }
-// #else
+#else
 /** With clause for view model
  *
  * @param      view           View instance pointer
@@ -229,10 +228,10 @@ void view_commit_model(View* view, bool update);
  * @param      update         Bool flag, if true, view will be updated after code block. Can be variable, so code block can decide if update is needed.
  *
  */
-// #define with_view_model(view, type, code, update) \
-//     {                                             \
-//         type = view_get_model(view);              \
-//         {code};                                   \
-//         view_commit_model(view, update);          \
-//     }
-// #endif
+#define with_view_model(view, type, code, update) \
+    {                                             \
+        type = view_get_model(view);              \
+        {code};                                   \
+        view_commit_model(view, update);          \
+    }
+#endif

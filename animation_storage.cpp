@@ -151,7 +151,7 @@ StorageAnimation* animation_storage_find_animation(const char* name) {
             break;
         }
     }
-
+    
     if(!storage_animation) {
         for(size_t i = 0; i < dolphin_internal_size; ++i) {
             if(!strcmp(dolphin_internal[i].manifest_info.name, name)) {
@@ -178,6 +178,8 @@ StorageAnimation* animation_storage_find_animation(const char* name) {
         }
     }
 
+    Serial.println("storage_animation");
+    Serial.println(storage_animation->manifest_info.name);
     return storage_animation;
 }
 

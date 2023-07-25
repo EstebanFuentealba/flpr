@@ -266,12 +266,12 @@ static bool animation_manager_check_blocking(AnimationManager* animation_manager
     //     animation_manager->levelup_pending = true;
     // }
 
-    // if(blocking_animation) {
-    //     furi_timer_stop(animation_manager->idle_animation_timer);
-    //     animation_manager_replace_current_animation(animation_manager, blocking_animation);
-    //     /* no timer starting because this is blocking animation */
-    //     animation_manager->state = AnimationManagerStateBlocked;
-    // }
+    if(blocking_animation) {
+        furi_timer_stop(animation_manager->idle_animation_timer);
+        animation_manager_replace_current_animation(animation_manager, blocking_animation);
+        /* no timer starting because this is blocking animation */
+        animation_manager->state = AnimationManagerStateBlocked;
+    }
 
     furi_record_close(RECORD_STORAGE);
 
@@ -303,20 +303,28 @@ static void animation_manager_replace_current_animation(
 
 AnimationManager* animation_manager_alloc(void) {
     AnimationManager* animation_manager = (AnimationManager*)malloc(sizeof(AnimationManager));
+    Serial.println("[animation_manager] malloc");
     animation_manager->animation_view = bubble_animation_view_alloc();
+    Serial.println("[animation_manager] bubble_animation_view_alloc");
     animation_manager->view_stack = view_stack_alloc();
+    Serial.println("[animation_manager] view_stack_alloc");
     View* animation_view = bubble_animation_get_view(animation_manager->animation_view);
+    Serial.println("[animation_manager] bubble_animation_get_view");
     view_stack_add_view(animation_manager->view_stack, animation_view);
+    Serial.println("[animation_manager] view_stack_add_view");
     animation_manager->freezed_animation_name = furi_string_alloc();
+    Serial.println("[animation_manager] furi_string_alloc");
 
-    animation_manager->idle_animation_timer =
-        furi_timer_alloc(animation_manager_timer_callback, FuriTimerTypeOnce, animation_manager);
-    bubble_animation_view_set_interact_callback(
-        animation_manager->animation_view, animation_manager_interact_callback, animation_manager);
+    animation_manager->idle_animation_timer = furi_timer_alloc(animation_manager_timer_callback, FuriTimerTypeOnce, animation_manager);
+    Serial.println("[animation_manager] idle_animation_timer");
+    bubble_animation_view_set_interact_callback(animation_manager->animation_view, animation_manager_interact_callback, animation_manager);
+    Serial.println("[animation_manager] bubble_animation_view_set_interact_callback");
 
     Storage* storage = (Storage*)furi_record_open(RECORD_STORAGE);
-    animation_manager->pubsub_subscription_storage = furi_pubsub_subscribe(
-        storage_get_pubsub(storage), animation_manager_check_blocking_callback, animation_manager);
+    Serial.println("[animation_manager] storage");
+    animation_manager->pubsub_subscription_storage = furi_pubsub_subscribe(storage_get_pubsub(storage), animation_manager_check_blocking_callback, animation_manager);
+
+    Serial.println("[animation_manager] pubsub_subscription_storage");
     furi_record_close(RECORD_STORAGE);
 
     // Dolphin* dolphin = furi_record_open(RECORD_DOLPHIN);
@@ -325,8 +333,10 @@ AnimationManager* animation_manager_alloc(void) {
     // furi_record_close(RECORD_DOLPHIN);
 
     animation_manager->sd_shown_sd_ok = true;
+    Serial.println("[animation_manager] sd_shown_sd_ok");
     if(!animation_manager_check_blocking(animation_manager)) {
         animation_manager_start_new_idle(animation_manager);
+    Serial.println("[animation_manager] animation_manager_start_new_idle");
     }
 
     return animation_manager;

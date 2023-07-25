@@ -403,6 +403,11 @@ uint32_t furi_thread_flags_clear(uint32_t flags) {
 
 
 
+void furi_thread_set_state_context(FuriThread* thread, void* context) {
+    // furi_assert(thread);
+    // furi_assert(thread->state == FuriThreadStateStopped);
+    thread->state_context = context;
+}
 
 uint32_t furi_thread_flags_wait(uint32_t flags, uint32_t options, uint32_t timeout) {
 
@@ -410,7 +415,7 @@ uint32_t furi_thread_flags_wait(uint32_t flags, uint32_t options, uint32_t timeo
     uint32_t clear;
     TickType_t t0, td, tout;
     BaseType_t rval;
-    Serial.println("[thread] try furi_thread_flags_wait");
+    // Serial.println("[thread] try furi_thread_flags_wait");
     // if (xPortInIsrContext()) {
     //     rflags = static_cast<uint32_t>(FuriStatusErrorISR);
     // } else 
