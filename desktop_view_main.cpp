@@ -4,7 +4,7 @@
 #include "canvas.h"
 #include "furi.h"
 #include "input.h"
-// #include "dolphin.h"
+#include "dolphin.h"
 
 #include "desktop_i.h"
 #include "desktop_view_main.h"

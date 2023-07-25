@@ -19,23 +19,22 @@ bool saved_struct_save(const char* path, void* data, size_t size, uint8_t magic,
     // furi_assert(size);
     SavedStructHeader header;
 
-    // FURI_LOG_I(TAG, "Saving \"%s\"", path);
+    Serial.printf("Saving \"%s\"\n", path);
 
     // Store
-    Storage* storage = furi_record_open(RECORD_STORAGE);
+    Storage* storage = (Storage*)furi_record_open(RECORD_STORAGE);
     FZFile* file = storage_file_alloc(storage);
     bool result = true;
     bool saved = storage_file_open(file, path, FILE_WRITE);
     if(!saved) {
-        // FURI_LOG_E(
-        //     TAG, "Open failed \"%s\". Error: \'%s\'", path, storage_file_get_error_desc(file));
+        Serial.printf("Open failed \"%s\". Error: \'%s\'\n", path, storage_file_get_error_desc(file));
         result = false;
     }
 
     if(result) {
         // Calculate checksum
         uint8_t checksum = 0;
-        uint8_t* source = data;
+        uint8_t* source = (uint8_t*)data;
         for(size_t i = 0; i < size; i++) {
             checksum += source[i];
         }
@@ -50,8 +49,7 @@ bool saved_struct_save(const char* path, void* data, size_t size, uint8_t magic,
         bytes_count += storage_file_write(file, data, size);
 
         if(bytes_count != (size + sizeof(header))) {
-            // FURI_LOG_E(
-            //     TAG, "Write failed \"%s\". Error: \'%s\'", path, storage_file_get_error_desc(file));
+           Serial.printf("Write failed \"%s\". Error: \'%s\'\n", path, storage_file_get_error_desc(file));
             result = false;
         }
     }
@@ -63,19 +61,22 @@ bool saved_struct_save(const char* path, void* data, size_t size, uint8_t magic,
 }
 
 bool saved_struct_load(const char* path, void* data, size_t size, uint8_t magic, uint8_t version) {
-    // FURI_LOG_I(TAG, "Loading \"%s\"", path);
+    Serial.printf("Loading \"%s\"\n", path);
 
     SavedStructHeader header;
 
-    uint8_t* data_read = malloc(size);
-    Storage* storage = furi_record_open(RECORD_STORAGE);
+    uint8_t* data_read = (uint8_t*)malloc(size);
+    Storage* storage = (Storage*)furi_record_open(RECORD_STORAGE);
+    Serial.printf("is open storage.\n");
     FZFile* file = storage_file_alloc(storage);
     bool result = true;
     bool loaded = storage_file_open(file, path, FILE_WRITE);
     if(!loaded) {
-        // FURI_LOG_E(
-        //     TAG, "Failed to read \"%s\". Error: %s", path, storage_file_get_error_desc(file));
+        Serial.printf("Failed to read \"%s\".\n", path);
+        Serial.printf("Failed to read \"%s\". Error: %s\n", path, storage_file_get_error_desc(file));
         result = false;
+    } else {
+         Serial.printf("read \"%s\".\n", path);
     }
 
     if(result) {
@@ -83,20 +84,18 @@ bool saved_struct_load(const char* path, void* data, size_t size, uint8_t magic,
         bytes_count += storage_file_read(file, data_read, size);
 
         if(bytes_count != (sizeof(SavedStructHeader) + size)) {
-            // FURI_LOG_E(TAG, "Size mismatch of file \"%s\"", path);
+            Serial.printf("Size mismatch of file \"%s\"\n", path);
             result = false;
         }
     }
 
     if(result && (header.magic != magic || header.version != version)) {
-        // FURI_LOG_E(
-        //     TAG,
-        //     "Magic(%d != %d) or Version(%d != %d) mismatch of file \"%s\"",
-        //     header.magic,
-        //     magic,
-        //     header.version,
-        //     version,
-        //     path);
+        Serial.printf("Magic(%d != %d) or Version(%d != %d) mismatch of file \"%s\"\n",
+            header.magic,
+            magic,
+            header.version,
+            version,
+            path);
         result = false;
     }
 
@@ -108,8 +107,7 @@ bool saved_struct_load(const char* path, void* data, size_t size, uint8_t magic,
         }
 
         if(header.checksum != checksum) {
-            // FURI_LOG_E(
-            //     TAG, "Checksum(%d != %d) mismatch of file \"%s\"", header.checksum, checksum, path);
+            Serial.printf("Checksum(%d != %d) mismatch of file \"%s\"\n", header.checksum, checksum, path);
             result = false;
         }
     }
@@ -135,32 +133,29 @@ bool saved_struct_get_payload_size(
     // furi_assert(payload_size);
 
     SavedStructHeader header;
-    Storage* storage = furi_record_open(RECORD_STORAGE);
+    Storage* storage = (Storage*)furi_record_open(RECORD_STORAGE);
     FZFile* file = storage_file_alloc(storage);
 
     bool result = false;
     do {
         if(!storage_file_open(file, path, FILE_WRITE)) {
-            // FURI_LOG_E(
-            //     TAG, "Failed to read \"%s\". Error: %s", path, storage_file_get_error_desc(file));
+            Serial.printf("Failed to read \"%s\". Error: %s\n", path, storage_file_get_error_desc(file));
             break;
         }
 
         uint16_t bytes_count = storage_file_read(file, &header, sizeof(SavedStructHeader));
         if(bytes_count != sizeof(SavedStructHeader)) {
-            // FURI_LOG_E(TAG, "Failed to read header");
+            Serial.printf("Failed to read header\n");
             break;
         }
 
         if((header.magic != magic) || (header.version != version)) {
-            // FURI_LOG_E(
-            //     TAG,
-            //     "Magic(%d != %d) or Version(%d != %d) mismatch of file \"%s\"",
-            //     header.magic,
-            //     magic,
-            //     header.version,
-            //     version,
-            //     path);
+            Serial.printf("Magic(%d != %d) or Version(%d != %d) mismatch of file \"%s\"\n",
+                header.magic,
+                magic,
+                header.version,
+                version,
+                path);
             break;
         }
 

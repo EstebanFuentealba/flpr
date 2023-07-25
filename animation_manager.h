@@ -3,7 +3,7 @@
 #include "view.h"
 #include "icon_i.h"
 #include <stdint.h>
-// #include "dolphin.h"
+#include "dolphin.h"
 
 typedef struct AnimationManager AnimationManager;
 

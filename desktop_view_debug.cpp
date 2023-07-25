@@ -1,8 +1,8 @@
 // #include <toolbox/version.h>
 #include "furi.h"
 #include "furi_hal.h"
-// #include "dolphin_state.h"
-// #include "dolphin.h"
+#include "dolphin_state.h"
+#include "dolphin.h"
 
 #include "desktop_i.h"
 #include "desktop_view_debug.h"

@@ -4,8 +4,8 @@
 const char* FLIPPER_AUTORUN_APP_NAME = "";
 // extern int32_t bt_srv(void* p);
 // extern int32_t cli_srv(void* p);
-// extern int32_t dialogs_srv(void* p);
-// extern int32_t dolphin_srv(void* p);
+extern int32_t dialogs_srv(void* p);
+extern int32_t dolphin_srv(void* p);
 extern int32_t desktop_srv(void* p);
 extern int32_t gui_srv(void* p);
 extern int32_t input_srv(void* p);
@@ -29,19 +29,20 @@ const FlipperInternalApplication FLIPPER_SERVICES[] = {
 //     //  .icon = NULL,
 //     //  .flags = FlipperApplicationFlagDefault },
 
-//     // {.app = dialogs_srv,
-//     //  .name = "DialogsSrv",
-//     //  .appid = "dialogs", 
-//     //  .stack_size = 1024,
-//     //  .icon = NULL,
-//     //  .flags = FlipperApplicationFlagDefault },
+    // {.app = dialogs_srv,
+    //  .name = "DialogsSrv",
+    //  .appid = "dialogs", 
+    //  .stack_size = 1024,
+    //  .icon = NULL,
+    //  .flags = FlipperInternalApplicationFlagDefault },
 
-//     // {.app = dolphin_srv,
-//     //  .name = "DolphinSrv",
-//     //  .appid = "dolphin", 
-//     //  .stack_size = 1024,
-//     //  .icon = NULL,
-//     //  .flags = FlipperApplicationFlagDefault },
+    
+     {.app = dolphin_srv,
+     .name = "DolphinSrv",
+     .appid = "dolphin", 
+     .stack_size = 1024,
+     .icon = NULL,
+     .flags = FlipperInternalApplicationFlagDefault },
 
     {.app = desktop_srv,
      .name = "DesktopSrv",
@@ -72,12 +73,12 @@ const FlipperInternalApplication FLIPPER_SERVICES[] = {
      .icon = NULL,
      .flags = FlipperInternalApplicationFlagDefault },
 
-//     // {.app = notification_srv,
-//     //  .name = "NotificationSrv",
-//     //  .appid = "notification", 
-//     //  .stack_size = 1536,
-//     //  .icon = NULL,
-//     //  .flags = FlipperApplicationFlagDefault },
+    // {.app = notification_srv,
+    //  .name = "NotificationSrv",
+    //  .appid = "notification", 
+    //  .stack_size = 1536,
+    //  .icon = NULL,
+    //  .flags = FlipperApplicationFlagDefault },
 
 //     // {.app = power_srv,
 //     //  .name = "PowerSrv",
@@ -91,7 +92,7 @@ const FlipperInternalApplication FLIPPER_SERVICES[] = {
      .appid = "storage", 
      .stack_size = 3072,
      .icon = NULL,
-     .flags = FlipperInternalApplicationFlagDefault }
+     .flags = FlipperInternalApplicationFlagDefault },
 };
 const size_t FLIPPER_SERVICES_COUNT = COUNT_OF(FLIPPER_SERVICES);
 // extern int32_t updater_srv(void* p);

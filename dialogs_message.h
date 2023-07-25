@@ -1,7 +1,7 @@
 #pragma once
 #include "furi.h"
 #include "dialogs_i.h"
-// #include <toolbox/api_lock.h>
+#include "api_lock.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,7 +40,7 @@ typedef enum {
 } DialogsAppCommand;
 
 typedef struct {
-    // FuriApiLock lock;
+    FuriApiLock lock;
     DialogsAppCommand command;
     DialogsAppData* data;
     DialogsAppReturn* return_data;
