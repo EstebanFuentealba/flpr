@@ -54,9 +54,9 @@ static void storage_app_sd_icon_draw_callback(Canvas* canvas, void* context) {
     case StorageStatusNotReady:
         break;
     case StorageStatusOK:
-        canvas_set_color(canvas, ColorBlack);
+        // canvas_set_color(canvas, ColorBlack);
         canvas_draw_icon(canvas, 0, 0, ICON_SD_MOUNTED);
-        canvas_set_color(canvas, ColorWhite);
+        // canvas_set_color(canvas, ColorWhite);
         break;
     default:
         canvas_draw_icon(canvas, 0, 0, ICON_SD_ERROR);

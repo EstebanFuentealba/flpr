@@ -32,7 +32,7 @@
 // const int pin_button_up = 27;
 const GpioPin gpio_button_down = {.pin = 32};
 const GpioPin gpio_button_up = {.pin = 25};
-const GpioPin gpio_button_left = {.pin = 14};
+const GpioPin gpio_button_left = {.pin = 16};
 const GpioPin gpio_button_right = {.pin = 26};
 const GpioPin gpio_button_ok = {.pin = 27};
 const GpioPin gpio_button_back = {.pin = 33};
